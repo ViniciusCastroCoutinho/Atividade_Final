@@ -1,4 +1,5 @@
 import pygame
+from menu import Menu
 from maze import Maze
 from tank import Tank
 from bullet import Bullet
@@ -26,7 +27,10 @@ class Game:
             pygame.display.set_caption("COMBAT")
 
             # game mode
-            game_mode = 'bullet bounce'
+            game_mode = 0
+
+            # menu screen
+            menu = Menu(screen)
 
             # tanks
             tanks = []
@@ -59,10 +63,38 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.game_start = False
+
+                    # menu screen
+                    if menu.status() == True:
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if event.button == pygame.mouse.get_pressed(3)[0]:
+                                if (menu.gm0_x <= pygame.mouse.get_pos()[0] <= menu.gm0_x + menu.gm0_w and
+                                        menu.gm0_y <= pygame.mouse.get_pos()[1] <= menu.gm0_y + menu.gm0_h):
+                                    game_mode = 0
+                                    menu.turn_off()
+
+                                elif (menu.gm1_x <= pygame.mouse.get_pos()[0] <= menu.gm1_x + menu.gm1_w and
+                                        menu.gm1_y <= pygame.mouse.get_pos()[1] <= menu.gm1_y + menu.gm1_h):
+                                    game_mode = 1
+                                    menu.turn_off()
+
+                                elif (menu.credits_x <= pygame.mouse.get_pos()[0] <= menu.credits_x + menu.credits_w and
+                                        menu.credits_y <= pygame.mouse.get_pos()[1] <= menu.credits_y + menu.credits_h):
+                                    menu.credits_screen = True
+
+                                elif (menu.quit_x <= pygame.mouse.get_pos()[0] <= menu.quit_x + menu.quit_w and
+                                        menu.quit_y <= pygame.mouse.get_pos()[1] <= menu.quit_y + menu.quit_h):
+                                    self.game_start = False
+
+                                elif (menu.credits_screen and
+                                      menu.back_x <= pygame.mouse.get_pos()[0] <= menu.back_x + menu.back_w and
+                                      menu.back_y <= pygame.mouse.get_pos()[1] <= menu.back_y + menu.back_h):
+                                    menu.credits_screen = False
+
                     if event.type == pygame.KEYUP:
                         if event.key == pygame.K_UP:
                             p1.action = 0
-                        if event.key == pygame.K_UP and event.key == pygame.K_UP:
+                        if event.key == pygame.K_RIGHT and event.key == pygame.K_UP:
                             p1.action = 1
                         if event.key == pygame.K_RIGHT:
                             p1.action = 2
@@ -82,9 +114,25 @@ class Game:
                 screen.fill(RED)
 
                 # drawing
-                screen.fill(RED)
-                pygame.draw.rect(screen, YELLOW, p1)  # so pra testar
-                maze.maze_draw(screen, YELLOW)
+                if menu.status() == True:
+                    screen.fill(RED)
+                    if not menu.credits_screen:
+                        screen.blit(menu.title, (menu.title_x, menu.title_y))
+                        screen.blit(menu.subtitle, (menu.subtitle_x, menu.subtitle_y))
+                        screen.blit(menu.game_mode0, (menu.gm0_x, menu.gm0_y))
+                        screen.blit(menu.game_mode1, (menu.gm1_x, menu.gm1_y))
+                        screen.blit(menu.quit, (menu.quit_x, menu.quit_y))
+                        screen.blit(menu.credits, (menu.credits_x, menu.credits_y))
+                    else:
+                        screen.blit(menu.matheus, (menu.matheus_x, menu.matheus_y))
+                        screen.blit(menu.rubens, (menu.rubens_x, menu.rubens_y))
+                        screen.blit(menu.vinicius, (menu.vinicius_x, menu.vinicius_y))
+                        screen.blit(menu.back, (menu.back_x, menu.back_y))
+
+                else:
+                    screen.fill(RED)
+                    pygame.draw.rect(screen, YELLOW, p1)  # so pra testar
+                    maze.maze_draw(screen, YELLOW)
 
                 # update animation
                 current_time = pygame.time.get_ticks()
