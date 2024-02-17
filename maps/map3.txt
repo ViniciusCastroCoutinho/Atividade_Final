@@ -1,0 +1,28 @@
+            # walls
+            std_dimension = 24
+            w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
+            w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
+            w92 = pygame.Rect(0, GAME_HEIGHT_START, WIDTH, std_dimension)
+            w93 = pygame.Rect(0, HEIGHT - std_dimension, WIDTH, std_dimension)
+
+            w1 = pygame.Rect(HALF_W // 4, 0.75 * HALF_GH_POS, 2 * std_dimension, std_dimension)
+            w2 = pygame.Rect(w1[0] + w1[2] // 2, w1[1], w1[2] // 2, HALF_GH_POS - w1[1])
+            w3 = pygame.Rect(0.75 * HALF_W, GAME_HEIGHT_START + 4 * std_dimension, w1[2], w1[3])
+            w4 = pygame.Rect(w3[0], w3[1] + 5 * std_dimension, w3[2], w3[3])
+            w5 = pygame.Rect(w3[0] + w3[2] // 2, w3[1], w3[2] // 2, w4[1] - w3[1])
+            w6 = pygame.Rect(HALF_W - std_dimension, HALF_GH_POS - std_dimension, std_dimension, std_dimension)
+
+            # maze
+            maze = Maze()
+            maze.add_wall(w1)
+            maze.add_wall(w2)
+            maze.add_wall(w3)
+            maze.add_wall(w4)
+            maze.add_wall(w5)
+            maze.add_wall(w6)
+            maze.mirror_walls_horizontally(GAME_HEIGHT_START, HEIGHT)
+            maze.mirror_walls_vertically(WIDTH)
+            maze.add_wall(w90)
+            maze.add_wall(w91)
+            maze.add_wall(w92)
+            maze.add_wall(w93)

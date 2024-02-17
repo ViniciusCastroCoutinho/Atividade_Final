@@ -1,0 +1,7 @@
+            # walls
+            vertical_line = pygame.Rect(HALF_W, GAME_HEIGHT_START, 1, GAME_HEIGHT)
+            horizontal_game_line = pygame.Rect(0, HALF_GH_POS, WIDTH, 1)
+
+	    # maze
+            maze.add_wall(vertical_line)
+            maze.add_wall(horizontal_game_line)

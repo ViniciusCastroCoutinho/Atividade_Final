@@ -20,7 +20,10 @@ class Game:
             HEIGHT = 720
             HALF_W = WIDTH // 2
             GAME_HEIGHT_START = 70
-            HALF_GH = (HEIGHT - GAME_HEIGHT_START) // 2
+            GAME_HEIGHT = HEIGHT - GAME_HEIGHT_START
+            HALF_GH_LENGHT = GAME_HEIGHT // 2
+            HALF_GH_POS = GAME_HEIGHT_START + (GAME_HEIGHT // 2)
+
 
             size = (WIDTH, HEIGHT)
             screen = pygame.display.set_mode(size)
@@ -40,20 +43,28 @@ class Game:
             bullets = []
 
             # walls
-            middle_line = pygame.Rect(HALF_W, GAME_HEIGHT_START, 1, 720 - GAME_HEIGHT_START)
-            w1 = pygame.Rect(0, GAME_HEIGHT_START, 24, 720 - GAME_HEIGHT_START)
-            w2 = pygame.Rect(0, GAME_HEIGHT_START, WIDTH, 24)
-            w3 = pygame.Rect(0, HEIGHT - 24, WIDTH, 24)
-            w4 = pygame.Rect(800, HALF_GH, 96, 96)
+            std_dimension = 24
+            w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
+            w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
+            w92 = pygame.Rect(0, GAME_HEIGHT_START, WIDTH, std_dimension)
+            w93 = pygame.Rect(0, HEIGHT - std_dimension, WIDTH, std_dimension)
+            w1 = pygame.Rect(HALF_W - std_dimension, HALF_GH_LENGHT // 2, std_dimension, 4 * std_dimension)
+            w2 = pygame.Rect(HALF_W // 2, HALF_GH_POS - std_dimension, 4 * std_dimension, std_dimension)
+            w3 = pygame.Rect(HALF_W // 4, 2 * HALF_GH_POS // 3, 2 * std_dimension, std_dimension)
+            w4 = pygame.Rect(w3[0] + w3[2] // 2, w3[1], w3[2] // 2, HALF_GH_POS - w3[1])
 
             # maze
             maze = Maze()
-            maze.add_wall(middle_line)
             maze.add_wall(w1)
             maze.add_wall(w2)
             maze.add_wall(w3)
             maze.add_wall(w4)
-            maze.mirror_walls(WIDTH)
+            maze.mirror_walls_horizontally(GAME_HEIGHT_START, HEIGHT)
+            maze.mirror_walls_vertically(WIDTH)
+            maze.add_wall(w90)
+            maze.add_wall(w91)
+            maze.add_wall(w92)
+            maze.add_wall(w93)
 
             # Clock
             clock = pygame.time.Clock()
@@ -65,7 +76,7 @@ class Game:
                         self.game_start = False
 
                     # menu screen
-                    if menu.status() == True:
+                    if menu.status() is True:
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if event.button == pygame.mouse.get_pressed(3)[0]:
                                 if (menu.gm0_x <= pygame.mouse.get_pos()[0] <= menu.gm0_x + menu.gm0_w and
@@ -114,7 +125,7 @@ class Game:
                 screen.fill(RED)
 
                 # drawing
-                if menu.status() == True:
+                if menu.status() is True:
                     screen.fill(RED)
                     if not menu.credits_screen:
                         screen.blit(menu.title, (menu.title_x, menu.title_y))
@@ -131,19 +142,18 @@ class Game:
 
                 else:
                     screen.fill(RED)
-                    pygame.draw.rect(screen, YELLOW, p1)  # so pra testar
                     maze.maze_draw(screen, YELLOW)
 
-                # update animation
-                current_time = pygame.time.get_ticks()
-                if current_time - p1.last_update >= p1.animation_cooldown:
-                    p1.frame += 1
-                    p1.last_update = current_time
-                    if p1.frame >= len(p1.animation_list[p1.action]):
-                        p1.frame = 0
+                    # update animation
+                    current_time = pygame.time.get_ticks()
+                    if current_time - p1.last_update >= p1.animation_cooldown:
+                        p1.frame += 1
+                        p1.last_update = current_time
+                        if p1.frame >= len(p1.animation_list[p1.action]):
+                            p1.frame = 0
 
-                # show frame
-                screen.blit(p1.animation_list[p1.action][p1.frame], (0, 0))
+                    # show frame
+                    screen.blit(p1.animation_list[p1.action][p1.frame], (0, 0))
 
                 # update screen
                 pygame.display.flip()
