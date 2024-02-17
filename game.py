@@ -35,13 +35,6 @@ class Game:
             # menu screen
             menu = Menu(screen)
 
-            # tanks
-            tanks = []
-            p1 = Tank(90, 90, 5, 5, "sprites/black_mage.png")
-
-            # bullets
-            bullets = []
-
             # walls
             std_dimension = 24
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
@@ -66,11 +59,53 @@ class Game:
             maze.add_wall(w92)
             maze.add_wall(w93)
 
+            # players
+            players = []
+            p_size = 90
+            p1 = Tank(p_size, p_size, std_dimension, HALF_GH_POS, "sprites/black_mage(1).png", 0)
+            p2 = Tank(p_size, p_size, WIDTH - std_dimension - p_size, HALF_GH_POS, "sprites/red_mage(1).png", 9)
+            players.append(p1)
+            players.append(p2)
+
+            # joysticks
+            # joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+
+            # bullets
+            bullets = []
+
             # Clock
             clock = pygame.time.Clock()
 
             while self.game_start:
+                # player movement
+                keys = pygame.key.get_pressed()
+                for player in players:
+                    if keys[player.up]:
+                        player.action = 0
+                        player.move_up()
+                        if keys[player.right]:
+                            player.action = 1
+                            player.move_right()
+                        elif keys[player.left]:
+                            player.action = 7
+                            player.move_left()
+                    elif keys[player.down]:
+                        player.action = 4
+                        player.move_down()
+                        if keys[player.right]:
+                            player.action = 3
+                            player.move_right()
+                        elif keys[player.left]:
+                            player.action = 5
+                            player.move_left()
+                    elif keys[player.right]:
+                        player.action = 2
+                        player.move_right()
+                    elif keys[player.left]:
+                        player.action = 6
+                        player.move_left()
 
+                # quit
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.game_start = False
@@ -102,28 +137,6 @@ class Game:
                                       menu.back_y <= pygame.mouse.get_pos()[1] <= menu.back_y + menu.back_h):
                                     menu.credits_screen = False
 
-                    if event.type == pygame.KEYUP:
-                        if event.key == pygame.K_UP:
-                            p1.action = 0
-                        if event.key == pygame.K_RIGHT and event.key == pygame.K_UP:
-                            p1.action = 1
-                        if event.key == pygame.K_RIGHT:
-                            p1.action = 2
-                        if event.key == pygame.K_RIGHT and event.key == pygame.K_DOWN:
-                            p1.action = 3
-                            p1.move_down()
-                            p1.move_right()
-                        if event.key == pygame.K_DOWN:
-                            p1.action = 4
-                        if event.key == pygame.K_DOWN and event.key == pygame.K_LEFT:
-                            p1.action = 5
-                        if event.key == pygame.K_LEFT:
-                            p1.action = 6
-                        if event.key == pygame.K_LEFT and event.key == pygame.K_UP:
-                            p1.action = 7
-
-                screen.fill(RED)
-
                 # drawing
                 if menu.status() is True:
                     screen.fill(RED)
@@ -146,14 +159,16 @@ class Game:
 
                     # update animation
                     current_time = pygame.time.get_ticks()
-                    if current_time - p1.last_update >= p1.animation_cooldown:
-                        p1.frame += 1
-                        p1.last_update = current_time
-                        if p1.frame >= len(p1.animation_list[p1.action]):
-                            p1.frame = 0
+                    for player in players:
+                        if current_time - player.last_update >= player.animation_cooldown:
+                            player.frame += 1
+                            player.last_update = current_time
+                            if player.frame >= len(player.animation_list[player.action]):
+                                player.frame = 0
 
-                    # show frame
-                    screen.blit(p1.animation_list[p1.action][p1.frame], (0, 0))
+                        # show frame
+                        screen.blit(player.animation_list[player.action][player.frame],
+                                    (player.positionx, player.positiony))
 
                 # update screen
                 pygame.display.flip()
