@@ -43,3 +43,11 @@ class Maze:
     def maze_draw(self, screen, color):
         for wall in self.walls:
             pygame.draw.rect(screen, color, wall)
+
+    def draw_map(self, screen, background):
+        if background == 0:
+            screen.fill((0, 0, 0))
+            scenario1 = pygame.image.load("assets/backgrounds/dungeon_background.png")
+            scaled_image = pygame.transform.scale(scenario1, (scenario1.get_width() * 4, scenario1.get_height() * 4))
+            screen.blit(scaled_image, (0, 0))
+            invisible_wall = []

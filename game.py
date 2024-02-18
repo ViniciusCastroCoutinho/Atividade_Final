@@ -15,6 +15,8 @@ class Game:
 
             RED = (144, 38, 10)
             YELLOW = (216, 169, 64)
+            WHITE = (255, 255, 255)
+            BLACK = (0 , 0, 0)
 
             WIDTH = 1280
             HEIGHT = 720
@@ -23,7 +25,6 @@ class Game:
             GAME_HEIGHT = HEIGHT - GAME_HEIGHT_START
             HALF_GH_LENGHT = GAME_HEIGHT // 2
             HALF_GH_POS = GAME_HEIGHT_START + (GAME_HEIGHT // 2)
-
 
             size = (WIDTH, HEIGHT)
             screen = pygame.display.set_mode(size)
@@ -61,9 +62,11 @@ class Game:
 
             # players
             players = []
-            p_size = 90
-            p1 = Tank(p_size, p_size, std_dimension, HALF_GH_POS, "sprites/black_mage(1).png", 0)
-            p2 = Tank(p_size, p_size, WIDTH - std_dimension - p_size, HALF_GH_POS, "sprites/red_mage(1).png", 9)
+            p_size_x = 52.2
+            p_size_y = 59.5
+            p1 = Tank(p_size_x, p_size_y, std_dimension, HALF_GH_POS, "assets/sprites/black_mage(1).png", 0)
+            p2 = Tank(p_size_x, p_size_y, WIDTH - std_dimension - p_size_x,
+                      HALF_GH_POS, "assets/sprites/red_mage(1).png", 1)
             players.append(p1)
             players.append(p2)
 
@@ -114,50 +117,35 @@ class Game:
                     if menu.status() is True:
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if event.button == pygame.mouse.get_pressed(3)[0]:
-                                if (menu.gm0_x <= pygame.mouse.get_pos()[0] <= menu.gm0_x + menu.gm0_w and
-                                        menu.gm0_y <= pygame.mouse.get_pos()[1] <= menu.gm0_y + menu.gm0_h):
+                                if menu.in_gm0():
                                     game_mode = 0
                                     menu.turn_off()
 
-                                elif (menu.gm1_x <= pygame.mouse.get_pos()[0] <= menu.gm1_x + menu.gm1_w and
-                                        menu.gm1_y <= pygame.mouse.get_pos()[1] <= menu.gm1_y + menu.gm1_h):
+                                elif menu.in_gm1():
                                     game_mode = 1
                                     menu.turn_off()
 
-                                elif (menu.credits_x <= pygame.mouse.get_pos()[0] <= menu.credits_x + menu.credits_w and
-                                        menu.credits_y <= pygame.mouse.get_pos()[1] <= menu.credits_y + menu.credits_h):
+                                elif menu.in_credits():
                                     menu.credits_screen = True
 
-                                elif (menu.quit_x <= pygame.mouse.get_pos()[0] <= menu.quit_x + menu.quit_w and
-                                        menu.quit_y <= pygame.mouse.get_pos()[1] <= menu.quit_y + menu.quit_h):
+                                elif menu.in_quit():
                                     self.game_start = False
 
-                                elif (menu.credits_screen and
-                                      menu.back_x <= pygame.mouse.get_pos()[0] <= menu.back_x + menu.back_w and
-                                      menu.back_y <= pygame.mouse.get_pos()[1] <= menu.back_y + menu.back_h):
+                                elif menu.in_back():
                                     menu.credits_screen = False
-
                 # drawing
                 if menu.status() is True:
-                    screen.fill(RED)
                     if not menu.credits_screen:
-                        screen.blit(menu.title, (menu.title_x, menu.title_y))
-                        screen.blit(menu.subtitle, (menu.subtitle_x, menu.subtitle_y))
-                        screen.blit(menu.game_mode0, (menu.gm0_x, menu.gm0_y))
-                        screen.blit(menu.game_mode1, (menu.gm1_x, menu.gm1_y))
-                        screen.blit(menu.quit, (menu.quit_x, menu.quit_y))
-                        screen.blit(menu.credits, (menu.credits_x, menu.credits_y))
+                        menu.menu_background(screen)
+                        menu.initial_menu(screen, 3, WHITE)
                     else:
-                        screen.blit(menu.matheus, (menu.matheus_x, menu.matheus_y))
-                        screen.blit(menu.rubens, (menu.rubens_x, menu.rubens_y))
-                        screen.blit(menu.vinicius, (menu.vinicius_x, menu.vinicius_y))
-                        screen.blit(menu.back, (menu.back_x, menu.back_y))
-
+                        menu.menu_background(screen)
+                        menu.credits_menu(screen, 3, WHITE)
                 else:
-                    screen.fill(RED)
-                    maze.maze_draw(screen, YELLOW)
+                    maze.draw_map(screen, 0)
+                    #maze.maze_draw(screen, YELLOW)
 
-                    # update animation
+                    # update animation walking
                     current_time = pygame.time.get_ticks()
                     for player in players:
                         if current_time - player.last_update >= player.animation_cooldown:
@@ -170,6 +158,18 @@ class Game:
                         screen.blit(player.animation_list[player.action][player.frame],
                                     (player.positionx, player.positiony))
 
+                    # update animation dashing ( tentativa... nao deu certo)
+                    for p in players:
+                        if keys[p.dash]:
+                            for player in players:
+                                if current_time - player.last_update >= player.animation_dash_cooldown:
+                                    player.dash_frame += 1
+                                    player.last_update = current_time
+                                    if player.dash_frame >= len(player.animation_dash_list[player.dash_action]):
+                                        player.dash_frame = 0
+                                # show dash
+                                screen.blit(player.animation_dash_list[player.dash_action][player.dash_frame],
+                                            (player.positionx, player.positiony))
                 # update screen
                 pygame.display.flip()
                 clock.tick(60)
