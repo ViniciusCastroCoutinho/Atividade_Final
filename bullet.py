@@ -1,9 +1,12 @@
 import pygame
+import random
 from spritesheet import SpriteSheet
 
 
 class Bullet:
     def __init__(self, shooter, width, height, sprite):
+        self.width = width
+        self.height = height
         self.shooter = shooter
         self.mvt_speed = 8
         self.x = shooter.positionx + shooter.crosshair_x
@@ -55,11 +58,35 @@ class Bullet:
                 self.step_counter += 1
             self.animation_list.append(temp_img_list)
 
-    def movement(self):
+    def move_x(self):
         self.x += self.mvt_x
-        self.y += self.mvt_y
         self.hit_box[0] = self.x
+
+    def move_y(self):
+        self.y += self.mvt_y
         self.hit_box[1] = self.y
+
+    def update_mvt_x(self, collider):
+        # if self.x < collider[0]:
+        #     self.x = collider[0] - self.width
+        # else:
+        #     self.x = collider[0] + self.width
+        self.x -= self.mvt_x
+        self.hit_box[0] = self.x
+        self.mvt_x *= -1
+        if self.mvt_y == 0:
+            self.mvt_y = -self.mvt_speed
+
+    def update_mvt_y(self, collider):
+        # if self.y < collider[1]:
+        #     self.y = collider[1] - self.height
+        # else:
+        #     self.y = collider[1] + self.height
+        self.y -= self.mvt_y
+        self.hit_box[1] = self.y
+        self.mvt_y *= -1
+        if self.mvt_x == 0:
+            self.mvt_x = self.mvt_speed
 
     def is_over(self):
         if pygame.time.get_ticks() - self.birth >= self.duration:
@@ -68,20 +95,15 @@ class Bullet:
         else:
             return 0
 
-    def update_movement(self, collision_type):
-        if collision_type == 1 and self.mvt_y < 0:
-            self.mvt_y *= -1
-            if self.mvt_x == 0:
-                self.mvt_x = self.mvt_speed
-        elif collision_type == 2 and self.mvt_y > 0:
-            self.mvt_y *= -1
-            if self.mvt_x == 0:
-                self.mvt_x = self.mvt_speed
-        elif collision_type == 3 and self.mvt_x > 0:
-            self.mvt_x *= -1
-            if self.mvt_y == 0:
-                self.mvt_y = -self.mvt_speed
-        elif collision_type == 4 and self.mvt_x < 0:
-            self.mvt_x *= -1
-            if self.mvt_y == 0:
-                self.mvt_y = -self.mvt_speed
+    def is_out_of_bounds(self, screen):
+        if self.x < 0 or self.x > screen.get_width() or self.y < 0 or self.y > screen.get_height():
+            self.shooter.has_bullet = False
+            return 1
+        else:
+            return 0
+
+    def is_in_wall(self, maze):
+        for wall in maze.walls:
+            if wall.contains(self.hit_box):
+                return 1
+        return 0

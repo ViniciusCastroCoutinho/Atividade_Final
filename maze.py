@@ -38,27 +38,7 @@ class Maze:
                     print(f"invalid mirror_line value {mirror_line} in maze")
 
     def collision(self, colliding_rect):
-        if colliding_rect.collidelist(self.walls) == -1:
-            # no collision
-            return 0
-        else:
-            wall = self.walls[colliding_rect.collidelist(self.walls)]
-            top_left = colliding_rect.topleft
-            top_right = colliding_rect.topright
-            bottom_left = colliding_rect.bottomleft
-            bottom_right = colliding_rect.bottomright
-            if wall.collidepoint(top_right) and wall.collidepoint(top_left):
-                # collision with bottom of the wall
-                return 1
-            elif wall.collidepoint(bottom_right) and wall.collidepoint(bottom_left):
-                # collision with top of the wall
-                return 2
-            elif wall.collidepoint(bottom_right) or wall.collidepoint(top_right):
-                # collision with left side of wall
-                return 3
-            elif wall.collidepoint(bottom_left) or wall.collidepoint(top_left):
-                # collision with right side of wall
-                return 4
+        return colliding_rect.collidelist(self.walls)
 
     def draw(self, screen, color):
         for wall in self.walls:

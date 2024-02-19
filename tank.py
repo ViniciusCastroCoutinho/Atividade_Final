@@ -11,6 +11,7 @@ class Tank:
         self.positiony = positiony
         self.hit_box = pygame.Rect(self.positionx, self.positiony, self.sizex, self.sizey)
         self.mvt_speed = 4
+        self.double_collision = 0
         # self.ball_speed = 4
 
         self.sprite_sheet_image = pygame.image.load(sprite).convert_alpha()
@@ -87,26 +88,18 @@ class Tank:
     def move_up(self):
         self.positiony -= self.mvt_speed
         self.hit_box[1] -= self.mvt_speed
-        if self.positiony <= 146:
-            self.positiony = 148
 
     def move_down(self):
         self.positiony += self.mvt_speed
         self.hit_box[1] += self.mvt_speed
-        if self.positiony > 650:
-            self.positiony = 648
 
-    def move_right(self):
+    def move_right(self, ):
         self.positionx += self.mvt_speed
         self.hit_box[0] += self.mvt_speed
-        if self.positionx >= 1227:
-            self.positionx = 1226
 
     def move_left(self):
         self.positionx -= self.mvt_speed
         self.hit_box[0] -= self.mvt_speed
-        if self.positionx < 0:
-            self.positionx = 1
 
     def crosshair(self, x, y):
         self.crosshair_x = x
