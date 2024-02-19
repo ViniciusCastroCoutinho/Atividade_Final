@@ -80,8 +80,9 @@ class Game:
             clock = pygame.time.Clock()
 
             while self.game_start:
-                # player movement
+                current_time = pygame.time.get_ticks()
                 keys = pygame.key.get_pressed()
+                # player movement
                 for player in players:
                     if keys[player.up]:
                         player.action = 8
@@ -119,9 +120,6 @@ class Game:
                         stop = player.stop_animation(player.action)
                         player.action = stop
 
-
-
-
                 # quit
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -147,6 +145,41 @@ class Game:
 
                                 elif menu.in_back():
                                     menu.credits_screen = False
+                    # player shooting
+                    for player in players:
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == player.shoot:
+                                if player.has_bullet is False:
+                                    bullets.append(Bullet(player, 40, 40, "assets/sprites/fireball_spritesheet(1).png"))
+                                    player.bullet_cooldown = current_time
+                                    player.has_bullet = True
+
+                # updating bullets
+                temp_bullets = list(bullets)
+                for bullet in bullets:
+                    if bullet.is_over():
+                        temp_bullets.remove(bullet)
+                    else:
+                        bullet.movement()
+                        # checking collision with walls
+                        if maze.collision(bullet.hit_box):
+                            if game_mode == 0:
+                                collision_type = maze.collision(bullet.hit_box)
+                                bullet.update_movement(collision_type)
+                            elif game_mode == 1:
+                                temp_bullets.remove(bullet)
+                                bullet.shooter.has_bullet = False
+
+                        # checking collision with enemies
+                        temp_players = list(players)
+                        for player in players:
+                            if player != bullet.shooter and player.bullet_collision(bullet):
+                                temp_bullets.remove(bullet)
+                                temp_players.remove(player)
+                                bullet.shooter.has_bullet = False
+                        players = temp_players
+                bullets = temp_bullets
+
                 # drawing
                 if menu.status() is True:
                     if not menu.credits_screen:
@@ -156,11 +189,11 @@ class Game:
                         menu.menu_background(screen)
                         menu.credits_menu(screen, 3, WHITE)
                 else:
+                    # maze
                     maze.draw_map(screen, 0)
-                    #maze.maze_draw(screen, YELLOW)
+                    maze.draw(screen, YELLOW)
 
                     # update animation walking
-                    current_time = pygame.time.get_ticks()
                     for player in players:
                         if current_time - player.last_update >= player.animation_cooldown:
                             player.frame += 1
@@ -169,11 +202,23 @@ class Game:
                                 player.frame = 0
 
                         # show frame
+                        # pygame.draw.rect(screen, BLACK, player.hit_box)  # hit_box
                         screen.blit(player.animation_list[player.action][player.frame],
                                     (player.positionx, player.positiony))
-                        pygame.draw.rect(screen, RED, (player.positionx + player.crosshair_x, player.positiony + player.crosshair_y, 20, 20))
+                        pygame.draw.rect(screen, RED, (player.positionx + player.crosshair_x,
+                                                       player.positiony + player.crosshair_y, 20, 20))
 
-                    # update magic atack
+                    # update bullet
+                    for bullet in bullets:
+                        if current_time - bullet.last_update >= bullet.animation_cooldown:
+                            bullet.frame += 1
+                            bullet.last_update = current_time
+                            if bullet.frame >= len(bullet.animation_list[bullet.action]):
+                                bullet.frame = 0
+                        # show frame
+                        # pygame.draw.rect(screen, (0, 0, 0), bullet.hit_box)  # hit_box
+                        screen.blit(bullet.animation_list[bullet.action][bullet.frame],
+                                    (bullet.x, bullet.y))
 
                 # update screen
                 pygame.display.flip()

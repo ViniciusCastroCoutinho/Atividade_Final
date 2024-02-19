@@ -37,10 +37,30 @@ class Maze:
                 else:
                     print(f"invalid mirror_line value {mirror_line} in maze")
 
-    def maze_collision(self, colliding_rect):
-        return colliding_rect.collidelist(self.walls)
+    def collision(self, colliding_rect):
+        if colliding_rect.collidelist(self.walls) == -1:
+            # no collision
+            return 0
+        else:
+            wall = self.walls[colliding_rect.collidelist(self.walls)]
+            top_left = colliding_rect.topleft
+            top_right = colliding_rect.topright
+            bottom_left = colliding_rect.bottomleft
+            bottom_right = colliding_rect.bottomright
+            if wall.collidepoint(top_right) and wall.collidepoint(top_left):
+                # collision with bottom of the wall
+                return 1
+            elif wall.collidepoint(bottom_right) and wall.collidepoint(bottom_left):
+                # collision with top of the wall
+                return 2
+            elif wall.collidepoint(bottom_right) or wall.collidepoint(top_right):
+                # collision with left side of wall
+                return 3
+            elif wall.collidepoint(bottom_left) or wall.collidepoint(top_left):
+                # collision with right side of wall
+                return 4
 
-    def maze_draw(self, screen, color):
+    def draw(self, screen, color):
         for wall in self.walls:
             pygame.draw.rect(screen, color, wall)
 
@@ -52,11 +72,11 @@ class Maze:
         if background == 0:
             screen.fill((0, 0, 0))
             screen.blit(self.scaled("assets/backgrounds/dungeon_background.png"), (0, 0))
-            screen.blit(self.scaled("assets/walls/left_wall.png"), (130, 190))
-            screen.blit(self.scaled("assets/walls/right_wall.png"), (1020, 190))
+            # screen.blit(self.scaled("assets/walls/left_wall.png"), (130, 190))
+            # screen.blit(self.scaled("assets/walls/right_wall.png"), (1020, 190))
 
             # obstacles
-            screen.blit(self.scaled("assets/walls/horizontal_double_wall.png"), (382, 317))
-            screen.blit(self.scaled("assets/walls/horizontal_double_wall.png"), (765, 384))
-            screen.blit(self.scaled("assets/walls/vertical_double_wall.png"), (635, 125))
-            screen.blit(self.scaled("assets/walls/vertical_double_wall.png"), (570, 512))
+            # screen.blit(self.scaled("assets/walls/horizontal_double_wall.png"), (382, 317))
+            # screen.blit(self.scaled("assets/walls/horizontal_double_wall.png"), (765, 384))
+            # screen.blit(self.scaled("assets/walls/vertical_double_wall.png"), (635, 125))
+            # screen.blit(self.scaled("assets/walls/vertical_double_wall.png"), (570, 512))

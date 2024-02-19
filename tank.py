@@ -1,5 +1,6 @@
 import pygame
 import spritesheet
+from bullet import Bullet
 
 
 class Tank:
@@ -8,9 +9,10 @@ class Tank:
         self.sizey = sizey
         self.positionx = positionx
         self.positiony = positiony
-        self.rect = pygame.Rect(self.sizex, self.sizey, self.positionx, self.positiony)
+        self.hit_box = pygame.Rect(self.positionx, self.positiony, self.sizex, self.sizey)
         self.mvt_speed = 4
-        self.ball_speed = 4
+        # self.ball_speed = 4
+
         self.sprite_sheet_image = pygame.image.load(sprite).convert_alpha()
         self.sprite_sheet = spritesheet.SpriteSheet(self.sprite_sheet_image)
         self.animation_list = []
@@ -20,7 +22,9 @@ class Tank:
         self.animation_cooldown = 100
         self.frame = 0
         self.step_counter = 0
-        self.magic = None
+
+        # shooting
+        self.has_bullet = False
         self.crosshair_x = 17
         self.crosshair_y = -40
         self.new_action = 0
@@ -60,7 +64,6 @@ class Tank:
                 self.magic_step_counter += 1
             self.magic_list.append(temp_magic_list)
 
-
         # control scheme
         if control_scheme == 0:
             self.up = pygame.K_w
@@ -83,21 +86,25 @@ class Tank:
 
     def move_up(self):
         self.positiony -= self.mvt_speed
+        self.hit_box[1] -= self.mvt_speed
         if self.positiony <= 146:
             self.positiony = 148
 
     def move_down(self):
         self.positiony += self.mvt_speed
+        self.hit_box[1] += self.mvt_speed
         if self.positiony > 650:
             self.positiony = 648
 
     def move_right(self):
         self.positionx += self.mvt_speed
+        self.hit_box[0] += self.mvt_speed
         if self.positionx >= 1227:
             self.positionx = 1226
 
     def move_left(self):
         self.positionx -= self.mvt_speed
+        self.hit_box[0] -= self.mvt_speed
         if self.positionx < 0:
             self.positionx = 1
 
@@ -132,6 +139,8 @@ class Tank:
             self.frame = 0
         return self.new_action
 
-
-
-
+    def bullet_collision(self, colliding_rect):
+        if colliding_rect.hit_box.colliderect(self.hit_box):
+            return 1
+        else:
+            return 0
