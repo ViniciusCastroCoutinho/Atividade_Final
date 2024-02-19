@@ -4,7 +4,7 @@ from bullet import Bullet
 
 
 class Tank:
-    def __init__(self, sizex, sizey, positionx, positiony, sprite, control_scheme):
+    def __init__(self, sizex, sizey, positionx, positiony, sprite_select, control_scheme):
         self.sizex = sizex
         self.sizey = sizey
         self.positionx = positionx
@@ -12,7 +12,19 @@ class Tank:
         self.hit_box = pygame.Rect(self.positionx, self.positiony, self.sizex, self.sizey)
         self.mvt_speed = 4
         self.double_collision = 0
-        # self.ball_speed = 4
+
+        if sprite_select == 0:
+            sprite = "assets/sprites/black_mage(1).png"
+            self.magic = "assets/sprites/black_ball(1).png"
+        elif sprite_select == 1:
+            sprite = "assets/sprites/blue_mage(1).png"
+            self.magic = "assets/sprites/blue_ball(1).png"
+        elif sprite_select == 2:
+            sprite = "assets/sprites/red_mage(1).png"
+            self.magic = "assets/sprites/fireball_spritesheet(1).png"
+        elif sprite_select == 3:
+            sprite = "assets/sprites/white_mage(1).png"
+            self.magic = "assets/sprites/white_ball(1).png"
 
         self.sprite_sheet_image = pygame.image.load(sprite).convert_alpha()
         self.sprite_sheet = spritesheet.SpriteSheet(self.sprite_sheet_image)
@@ -37,33 +49,6 @@ class Tank:
                 temp_img_list.append(self.sprite_sheet.get_image(self.step_counter, 15, 17, 3.5, (254, 254, 254)))
                 self.step_counter += 1
             self.animation_list.append(temp_img_list)
-
-        # declaring magic animation
-        if sprite == "assets/sprites/black_mage(1).png" or "assets/sprites/black_mage.png":
-            self.magic = pygame.image.load("assets/sprites/black_ball.png")
-        elif sprite == "assets/sprites/blue_mage(1).png" or "assets/sprites/blue_mage.png":
-            self.magic = pygame.image.load("assets/sprites/blue_ball.png")
-        elif sprite == "assets/sprites/red_mage(1).png" or "assets/sprites/red_mage.png":
-            self.magic = pygame.image.load("assets/sprites/fireball_spritesheet.png")
-        elif sprite == "assets/sprites/white_mage.png" or "assets/sprites/white_mage(1).png":
-            self.magic = pygame.image.load("assets/sprites/white_ball.png")
-
-        self.sprite_sheet_magic = self.magic.convert_alpha()
-        self.sprite_sheet_magic_animation = spritesheet.SpriteSheet(self.sprite_sheet_magic)
-        self.magic_list = []
-        self.magic_steps = []
-        self.magic_action = 0
-        self.magic_animation_cooldown = 100
-        self.magic_frame = 0
-        self.magic_step_counter = 0
-
-        for animation in self.magic_steps:
-            temp_magic_list = []
-            for _ in range(animation):
-                temp_magic_list.append(self.sprite_sheet_magic_animation.get_image
-                                       (self.magic_step_counter, 15, 17, 3.5, (254, 254, 254)))
-                self.magic_step_counter += 1
-            self.magic_list.append(temp_magic_list)
 
         # control scheme
         if control_scheme == 0:

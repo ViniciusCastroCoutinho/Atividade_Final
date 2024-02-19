@@ -74,9 +74,9 @@ class Game:
             players = []
             p_size_x = 52.2
             p_size_y = 59.5
-            p1 = Tank(p_size_x, p_size_y, std_dimension, HALF_GH_POS, "assets/sprites/black_mage(1).png", 0)
+            p1 = Tank(p_size_x, p_size_y, std_dimension, HALF_GH_POS, 0, 0)
             p2 = Tank(p_size_x, p_size_y, WIDTH - std_dimension - p_size_x,
-                      HALF_GH_POS, "assets/sprites/red_mage(1).png", 1)
+                      HALF_GH_POS, 2, 1)
             players.append(p1)
             players.append(p2)
 
@@ -186,7 +186,7 @@ class Game:
                         if event.type == pygame.KEYDOWN:
                             if event.key == player.shoot:
                                 if player.has_bullet is False:
-                                    bullets.append(Bullet(player, 40, 40, "assets/sprites/fireball_spritesheet(1).png"))
+                                    bullets.append(Bullet(player, 40, 40, player.magic))
                                     player.bullet_cooldown = current_time
                                     magic_summon.play()
                                     player.has_bullet = True
