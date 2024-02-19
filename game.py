@@ -74,9 +74,9 @@ class Game:
             players = []
             p_size_x = 52.2
             p_size_y = 59.5
-            p1 = Tank(p_size_x, p_size_y, std_dimension, HALF_GH_POS, 0, 0)
+            p1 = Tank(p_size_x, p_size_y, std_dimension, HALF_GH_POS, 3, 3, 0)
             p2 = Tank(p_size_x, p_size_y, WIDTH - std_dimension - p_size_x,
-                      HALF_GH_POS, 2, 1)
+                      HALF_GH_POS, 2, 1, 1)
             players.append(p1)
             players.append(p2)
 

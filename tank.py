@@ -4,7 +4,7 @@ from bullet import Bullet
 
 
 class Tank:
-    def __init__(self, sizex, sizey, positionx, positiony, sprite_select, control_scheme):
+    def __init__(self, sizex, sizey, positionx, positiony, skin, magic, control_scheme):
         self.sizex = sizex
         self.sizey = sizey
         self.positionx = positionx
@@ -13,18 +13,27 @@ class Tank:
         self.mvt_speed = 4
         self.double_collision = 0
 
-        if sprite_select == 0:
-            sprite = "assets/sprites/black_mage(1).png"
-            self.magic = "assets/sprites/black_ball(1).png"
-        elif sprite_select == 1:
-            sprite = "assets/sprites/blue_mage(1).png"
-            self.magic = "assets/sprites/blue_ball(1).png"
-        elif sprite_select == 2:
-            sprite = "assets/sprites/red_mage(1).png"
-            self.magic = "assets/sprites/fireball_spritesheet(1).png"
-        elif sprite_select == 3:
-            sprite = "assets/sprites/white_mage(1).png"
-            self.magic = "assets/sprites/white_ball(1).png"
+        if skin == 0:
+            sprite = "assets/sprites/black_mage.png"
+        elif skin == 1:
+            sprite = "assets/sprites/blue_mage.png"
+        elif skin == 2:
+            sprite = "assets/sprites/red_mage.png"
+        elif skin == 3:
+            sprite = "assets/sprites/white_mage.png"
+        elif skin == 4:
+            sprite = "assets/sprites/green_mage.png"
+
+        if magic == 0:
+            self.magic = "assets/sprites/black_ball.png"
+        elif magic == 1:
+            self.magic = "assets/sprites/blue_ball.png"
+        elif magic == 2:
+            self.magic = "assets/sprites/fireball_spritesheet.png"
+        elif magic == 3:
+            self.magic = "assets/sprites/white_ball.png"
+        elif magic == 4:
+            self.magic = "assets/sprites/earth_ball.png"
 
         self.sprite_sheet_image = pygame.image.load(sprite).convert_alpha()
         self.sprite_sheet = spritesheet.SpriteSheet(self.sprite_sheet_image)
