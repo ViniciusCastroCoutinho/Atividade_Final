@@ -84,29 +84,43 @@ class Game:
                 keys = pygame.key.get_pressed()
                 for player in players:
                     if keys[player.up]:
-                        player.action = 0
+                        player.action = 8
                         player.move_up()
+                        player.crosshair(17, -40)
                         if keys[player.right]:
-                            player.action = 1
+                            player.action = 9
+                            player.crosshair(70, -20)
                             player.move_right()
                         elif keys[player.left]:
-                            player.action = 7
+                            player.action = 15
+                            player.crosshair(-38, -20)
                             player.move_left()
                     elif keys[player.down]:
-                        player.action = 4
+                        player.action = 12
+                        player.crosshair(17, 80)
                         player.move_down()
                         if keys[player.right]:
-                            player.action = 3
+                            player.action = 11
+                            player.crosshair(70, 70)
                             player.move_right()
                         elif keys[player.left]:
-                            player.action = 5
+                            player.action = 13
+                            player.crosshair(-38, 70)
                             player.move_left()
                     elif keys[player.right]:
-                        player.action = 2
+                        player.action = 10
+                        player.crosshair(70, 40)
                         player.move_right()
                     elif keys[player.left]:
-                        player.action = 6
+                        player.action = 14
+                        player.crosshair(-38, 40)
                         player.move_left()
+                    else:
+                        stop = player.stop_animation(player.action)
+                        player.action = stop
+
+
+
 
                 # quit
                 for event in pygame.event.get():
@@ -157,19 +171,10 @@ class Game:
                         # show frame
                         screen.blit(player.animation_list[player.action][player.frame],
                                     (player.positionx, player.positiony))
+                        pygame.draw.rect(screen, RED, (player.positionx + player.crosshair_x, player.positiony + player.crosshair_y, 20, 20))
 
-                    # update animation dashing ( tentativa... nao deu certo)
-                    for p in players:
-                        if keys[p.dash]:
-                            for player in players:
-                                if current_time - player.last_update >= player.animation_dash_cooldown:
-                                    player.dash_frame += 1
-                                    player.last_update = current_time
-                                    if player.dash_frame >= len(player.animation_dash_list[player.dash_action]):
-                                        player.dash_frame = 0
-                                # show dash
-                                screen.blit(player.animation_dash_list[player.dash_action][player.dash_frame],
-                                            (player.positionx, player.positiony))
+                    # update magic atack
+
                 # update screen
                 pygame.display.flip()
                 clock.tick(60)
