@@ -60,6 +60,16 @@ class Game:
             maze.add_wall(w92)
             maze.add_wall(w93)
 
+            # music & sounds
+            pygame.mixer.music.load(
+                'assets/sounds/[FREE] Kingdom Hearts - Dearly Beloved 8-Bit (No copyright music) #kingdomhearts'
+                ' #8bit #remix #chill.mp3')
+            pygame.mixer.music.play(90, 0.0, 1000)
+            walk = pygame.mixer.Sound('assets/sounds/walk_sfx.wav')
+            magic_summon = pygame.mixer.Sound('assets/sounds/bullet_summon.wav')
+            magic_bounce = pygame.mixer.Sound('assets/sounds/bullet_bounce.wav')
+            player_take_damage = pygame.mixer.Sound('assets/sounds/mage_damage.wav')
+
             # players
             players = []
             p_size_x = 52.2
@@ -86,35 +96,43 @@ class Game:
                 for player in players:
                     if keys[player.up]:
                         player.action = 8
+                        walk.play()
                         player.move_up()
                         player.crosshair(17, -40)
                         if keys[player.right]:
                             player.action = 9
                             player.crosshair(70, -20)
+                            walk.play()
                             player.move_right()
                         elif keys[player.left]:
                             player.action = 15
                             player.crosshair(-38, -20)
+                            walk.play()
                             player.move_left()
                     elif keys[player.down]:
                         player.action = 12
                         player.crosshair(17, 80)
+                        walk.play()
                         player.move_down()
                         if keys[player.right]:
                             player.action = 11
                             player.crosshair(70, 70)
+                            walk.play()
                             player.move_right()
                         elif keys[player.left]:
                             player.action = 13
                             player.crosshair(-38, 70)
+                            walk.play()
                             player.move_left()
                     elif keys[player.right]:
                         player.action = 10
                         player.crosshair(70, 40)
+                        walk.play()
                         player.move_right()
                     elif keys[player.left]:
                         player.action = 14
                         player.crosshair(-38, 40)
+                        walk.play()
                         player.move_left()
                     else:
                         stop = player.stop_animation(player.action)
@@ -132,10 +150,17 @@ class Game:
                                 if menu.in_gm0():
                                     game_mode = 0
                                     menu.turn_off()
+                                    pygame.mixer.music.pause()
+                                    pygame.mixer.music.load('assets/sounds/RPG_MUSIC.mp3')
+                                    pygame.mixer.music.play(-1, 1, 0)
+
 
                                 elif menu.in_gm1():
                                     game_mode = 1
                                     menu.turn_off()
+                                    pygame.mixer.music.pause()
+                                    pygame.mixer.music.load('assets/sounds/RPG_MUSIC.mp3')
+                                    pygame.mixer.music.play(-1, 1, 0)
 
                                 elif menu.in_credits():
                                     menu.credits_screen = True
@@ -152,6 +177,7 @@ class Game:
                                 if player.has_bullet is False:
                                     bullets.append(Bullet(player, 40, 40, "assets/sprites/fireball_spritesheet(1).png"))
                                     player.bullet_cooldown = current_time
+                                    magic_summon.play()
                                     player.has_bullet = True
 
                 # updating bullets
@@ -166,6 +192,7 @@ class Game:
                             if game_mode == 0:
                                 collision_type = maze.collision(bullet.hit_box)
                                 bullet.update_movement(collision_type)
+                                magic_bounce.play()
                             elif game_mode == 1:
                                 temp_bullets.remove(bullet)
                                 bullet.shooter.has_bullet = False
@@ -176,6 +203,7 @@ class Game:
                             if player != bullet.shooter and player.bullet_collision(bullet):
                                 temp_bullets.remove(bullet)
                                 temp_players.remove(player)
+                                player_take_damage.play()
                                 bullet.shooter.has_bullet = False
                         players = temp_players
                 bullets = temp_bullets
