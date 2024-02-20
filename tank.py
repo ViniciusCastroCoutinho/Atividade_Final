@@ -4,15 +4,38 @@ from bullet import Bullet
 
 
 class Tank:
-    def __init__(self, sizex, sizey, positionx, positiony, sprite, control_scheme):
-        self.sizex = sizex
-        self.sizey = sizey
+    def __init__(self, width, height, positionx, positiony, skin, magic, control_scheme, controller=None):
+        self.width = width
+        self.height = height
         self.positionx = positionx
         self.positiony = positiony
-        self.hit_box = pygame.Rect(self.positionx, self.positiony, self.sizex, self.sizey)
+        self.hit_box = pygame.Rect(self.positionx, self.positiony, self.width, self.height)
         self.mvt_speed = 4
-        self.double_collision = 0
-        # self.ball_speed = 4
+        self.control_scheme = control_scheme
+        if controller is not None:
+            self.controller = controller
+
+        if skin == 0:
+            sprite = "assets/sprites/black_mage.png"
+        elif skin == 1:
+            sprite = "assets/sprites/blue_mage.png"
+        elif skin == 2:
+            sprite = "assets/sprites/red_mage.png"
+        elif skin == 3:
+            sprite = "assets/sprites/white_mage.png"
+        elif skin == 4:
+            sprite = "assets/sprites/green_mage.png"
+
+        if magic == 0:
+            self.magic = "assets/sprites/black_ball.png"
+        elif magic == 1:
+            self.magic = "assets/sprites/blue_ball.png"
+        elif magic == 2:
+            self.magic = "assets/sprites/fireball_spritesheet.png"
+        elif magic == 3:
+            self.magic = "assets/sprites/white_ball.png"
+        elif magic == 4:
+            self.magic = "assets/sprites/earth_ball.png"
 
         self.sprite_sheet_image = pygame.image.load(sprite).convert_alpha()
         self.sprite_sheet = spritesheet.SpriteSheet(self.sprite_sheet_image)
@@ -26,8 +49,9 @@ class Tank:
 
         # shooting
         self.has_bullet = False
-        self.crosshair_x = 17
-        self.crosshair_y = -40
+        self.crosshair = pygame.Rect(0, 0, 20, 20)
+        self.crosshair.centerx = self.hit_box.centerx
+        self.crosshair.centery = self.hit_box.centery - 1.5 * self.height
         self.new_action = 0
 
         # declaring player animation
@@ -38,32 +62,6 @@ class Tank:
                 self.step_counter += 1
             self.animation_list.append(temp_img_list)
 
-        # declaring magic animation
-        if sprite == "assets/sprites/black_mage(1).png" or "assets/sprites/black_mage.png":
-            self.magic = pygame.image.load("assets/sprites/black_ball.png")
-        elif sprite == "assets/sprites/blue_mage(1).png" or "assets/sprites/blue_mage.png":
-            self.magic = pygame.image.load("assets/sprites/blue_ball.png")
-        elif sprite == "assets/sprites/red_mage(1).png" or "assets/sprites/red_mage.png":
-            self.magic = pygame.image.load("assets/sprites/fireball_spritesheet.png")
-        elif sprite == "assets/sprites/white_mage.png" or "assets/sprites/white_mage(1).png":
-            self.magic = pygame.image.load("assets/sprites/white_ball.png")
-
-        self.sprite_sheet_magic = self.magic.convert_alpha()
-        self.sprite_sheet_magic_animation = spritesheet.SpriteSheet(self.sprite_sheet_magic)
-        self.magic_list = []
-        self.magic_steps = []
-        self.magic_action = 0
-        self.magic_animation_cooldown = 100
-        self.magic_frame = 0
-        self.magic_step_counter = 0
-
-        for animation in self.magic_steps:
-            temp_magic_list = []
-            for _ in range(animation):
-                temp_magic_list.append(self.sprite_sheet_magic_animation.get_image
-                                       (self.magic_step_counter, 15, 17, 3.5, (254, 254, 254)))
-                self.magic_step_counter += 1
-            self.magic_list.append(temp_magic_list)
 
         # control scheme
         if control_scheme == 0:
@@ -79,9 +77,9 @@ class Tank:
             self.right = pygame.K_RIGHT
             self.shoot = pygame.K_RSHIFT
         elif control_scheme == 2:
-            pass
-        elif control_scheme == 3:
-            pass
+            self.shoot = 0
+            self.axis_x = self.controller.get_axis(0)
+            self.axis_y = self.controller.get_axis(1)
         else:
             print(f"invalid control scheme '{control_scheme}'")
 
@@ -101,9 +99,31 @@ class Tank:
         self.positionx -= self.mvt_speed
         self.hit_box[0] -= self.mvt_speed
 
-    def crosshair(self, x, y):
-        self.crosshair_x = x
-        self.crosshair_y = y
+    def get_axis_y(self):
+        self.axis_y = self.controller.get_axis(1)
+        return self.axis_y
+
+    def get_axis_x(self):
+        self.axis_x = self.controller.get_axis(0)
+        return self.axis_x
+
+    def crosshair_update(self, direction1):
+        if direction1 == 'up':
+            self.crosshair.centerx = self.hit_box.centerx
+            self.crosshair.centery = self.hit_box.centery - 1.5 * self.height
+        elif direction1 == 'down':
+            self.crosshair.centerx = self.hit_box.centerx
+            self.crosshair.centery = self.hit_box.centery + 1.5 * self.height
+        elif direction1 == 'right':
+            self.crosshair.centerx = self.hit_box.centerx + 1.5 * self.width
+            self.crosshair.centery = self.hit_box.centery
+        elif direction1 == '+right':
+            self.crosshair.centerx += 1.5 * self.width
+        elif direction1 == 'left':
+            self.crosshair.centerx = self.hit_box.centerx - 1.5 * self.width
+            self.crosshair.centery = self.hit_box.centery
+        elif direction1 == '+left':
+            self.crosshair.centerx -= 1.5 * self.width
 
     def stop_animation(self, action):
         if action == 8:

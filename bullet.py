@@ -1,5 +1,4 @@
 import pygame
-import random
 from spritesheet import SpriteSheet
 
 
@@ -9,9 +8,10 @@ class Bullet:
         self.height = height
         self.shooter = shooter
         self.mvt_speed = 8
-        self.x = shooter.positionx + shooter.crosshair_x
-        self.y = shooter.positiony + shooter.crosshair_y
-        self.hit_box = pygame.Rect(self.x, self.y, width, height)
+        self.hit_box = pygame.Rect(0, 0, width, height)
+        self.hit_box.center = shooter.hit_box.center
+        self.x = self.hit_box.topleft[0]
+        self.y = self.hit_box.topleft[1]
         self.direction = shooter.action
         self.duration = 2000
         self.birth = pygame.time.get_ticks()
@@ -67,26 +67,39 @@ class Bullet:
         self.hit_box[1] = self.y
 
     def update_mvt_x(self, collider):
-        # if self.x < collider[0]:
-        #     self.x = collider[0] - self.width
-        # else:
-        #     self.x = collider[0] + self.width
+        if self.mvt_y == 0:
+            if self.mvt_x > 0:
+                self.mvt_y = self.mvt_speed
+            else:
+                self.mvt_y = -self.mvt_speed
+
+        if self.x < collider[0]:
+            self.x = collider[0] - self.width
+        else:
+            self.x = collider[0] + collider[2]
         self.x -= self.mvt_x
         self.hit_box[0] = self.x
         self.mvt_x *= -1
-        if self.mvt_y == 0:
-            self.mvt_y = -self.mvt_speed
 
     def update_mvt_y(self, collider):
-        # if self.y < collider[1]:
-        #     self.y = collider[1] - self.height
-        # else:
-        #     self.y = collider[1] + self.height
+        if self.mvt_x == 0:
+            if self.mvt_y > 0:
+                self.mvt_x = -self.mvt_speed
+            else:
+                self.mvt_x = self.mvt_speed
+
+        if self.y < collider[1]:
+            self.y = collider[1] - self.height
+        else:
+            self.y = collider[1] + collider[3]
         self.y -= self.mvt_y
         self.hit_box[1] = self.y
         self.mvt_y *= -1
         if self.mvt_x == 0:
-            self.mvt_x = self.mvt_speed
+            if self.mvt_y > 0:
+                self.mvt_x = -self.mvt_speed
+            else:
+                self.mvt_x = self.mvt_speed
 
     def is_over(self):
         if pygame.time.get_ticks() - self.birth >= self.duration:

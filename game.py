@@ -70,18 +70,29 @@ class Game:
             magic_bounce = pygame.mixer.Sound('assets/sounds/bullet_bounce.wav')
             player_take_damage = pygame.mixer.Sound('assets/sounds/mage_damage.wav')
 
+            # joysticks
+            joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+
             # players
             players = []
             p_size_x = 52.2
             p_size_y = 59.5
-            p1 = Tank(p_size_x, p_size_y, std_dimension, HALF_GH_POS, "assets/sprites/black_mage(1).png", 0)
-            p2 = Tank(p_size_x, p_size_y, WIDTH - std_dimension - p_size_x,
-                      HALF_GH_POS, "assets/sprites/red_mage(1).png", 1)
+
+            p1 = Tank(p_size_x, p_size_y, std_dimension, HALF_GH_POS, 3, 3, 0)
             players.append(p1)
+
+            p2 = Tank(p_size_x, p_size_y, WIDTH - std_dimension - p_size_x,
+                      HALF_GH_POS, 2, 1, 1)
             players.append(p2)
 
-            # joysticks
-            # joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+            if len(joysticks) > 0:
+                p3 = Tank(p_size_x, p_size_y, HALF_W,
+                          HEIGHT - 1.5 * p_size_y, 0, 2, 2, joysticks[0])
+                players.append(p3)
+                if len(joysticks) > 1:
+                    p4 = Tank(p_size_x, p_size_y, HALF_W,
+                              HEIGHT - 1.5 * p_size_y, 1, 0, 2, joysticks[0])
+                    players.append(p4)
 
             # bullets
             bullets = []
@@ -92,63 +103,153 @@ class Game:
             while self.game_start:
                 current_time = pygame.time.get_ticks()
                 keys = pygame.key.get_pressed()
-                # player movement
+                # player controls
                 for player in players:
-                    if keys[player.up]:
-                        player.action = 8
-                        player.move_up()
-                        walk.play()
-                        if maze.collision(player.hit_box) != -1:
-                            player.move_down()
-                        player.crosshair(17, -40)
-                        if keys[player.right]:
-                            player.action = 9
-                            player.crosshair(70, -20)
-                            player.move_right()
-                            if maze.collision(player.hit_box) != -1:
-                                player.move_left()
-                        elif keys[player.left]:
-                            player.action = 15
-                            player.crosshair(-38, -20)
-                            player.move_left()
-                        if maze.collision(player.hit_box) != -1:
-                            player.move_right()
-                    elif keys[player.down]:
-                        player.action = 12
-                        player.crosshair(17, 80)
-                        walk.play()
-                        player.move_down()
-                        if maze.collision(player.hit_box) != -1:
+                    if player.control_scheme <= 1:
+                        # movement
+                        if keys[player.up]:
+                            player.action = 8
                             player.move_up()
-                        if keys[player.right]:
-                            player.action = 11
-                            player.crosshair(70, 70)
-                            player.move_right()
+                            player.crosshair_update('up')
+                            walk.play()
+                            # check collision
                             if maze.collision(player.hit_box) != -1:
+                                player.move_down()
+                            # check for diagonal movement
+                            if keys[player.right]:
+                                player.action = 9
+                                player.move_right()
+                                player.crosshair_update('+right')
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_left()
+
+                            elif keys[player.left]:
+                                player.action = 15
                                 player.move_left()
-                        elif keys[player.left]:
-                            player.action = 13
-                            player.crosshair(-38, 70)
-                            player.move_left()
+                                player.crosshair_update('+left')
                             if maze.collision(player.hit_box) != -1:
                                 player.move_right()
-                    elif keys[player.right]:
-                        player.action = 10
-                        player.crosshair(70, 40)
-                        walk.play()
-                        player.move_right()
-                        if maze.collision(player.hit_box) != -1:
-                            player.move_left()
-                    elif keys[player.left]:
-                        player.action = 14
-                        player.crosshair(-38, 40)
-                        walk.play()
-                        player.move_left()
-                        if maze.collision(player.hit_box) != -1:
+
+                        elif keys[player.down]:
+                            player.action = 12
+                            walk.play()
+                            player.move_down()
+                            player.crosshair_update('down')
+
+                            if maze.collision(player.hit_box) != -1:
+                                player.move_up()
+
+                            if keys[player.right]:
+                                player.action = 11
+                                player.move_right()
+                                player.crosshair_update('+right')
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_left()
+
+                            elif keys[player.left]:
+                                player.action = 13
+                                player.move_left()
+                                player.crosshair_update('+left')
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_right()
+
+                        elif keys[player.right]:
+                            player.action = 10
+                            walk.play()
                             player.move_right()
-                    else:
-                        stop = player.stop_animation(player.action)
-                        player.action = stop
+                            player.crosshair_update('right')
+
+                            if maze.collision(player.hit_box) != -1:
+                                player.move_left()
+
+                        elif keys[player.left]:
+                            player.action = 14
+                            walk.play()
+                            player.move_left()
+                            player.crosshair_update('left')
+
+                            if maze.collision(player.hit_box) != -1:
+                                player.move_right()
+                        else:
+                            stop = player.stop_animation(player.action)
+                            player.action = stop
+                        # shooting
+                        if keys[player.shoot]:
+                            if player.has_bullet is False:
+                                bullets.append(Bullet(player, 40, 40,
+                                                      player.magic))
+                                player.bullet_cooldown = current_time
+                                magic_summon.play()
+                                player.has_bullet = True
+                    elif player.control_scheme == 2:
+                        # movement
+                        if abs(player.get_axis_y()) > 0.4:
+                            if player.axis_y < 0:
+                                player.action = 8
+                                player.move_up()
+                                player.crosshair_update('up')
+                                walk.play()
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_down()
+                                if abs(player.get_axis_x()) > 0.4:
+                                    if player.axis_x > 0:
+                                        player.action = 9
+                                        player.move_right()
+                                        player.crosshair_update('+right')
+                                        if maze.collision(player.hit_box) != -1:
+                                            player.move_left()
+                                    elif player.axis_x < 0:
+                                        player.action = 15
+                                        player.move_left()
+                                        player.crosshair_update('+left')
+                                    if maze.collision(player.hit_box) != -1:
+                                        player.move_right()
+                            elif player.axis_y > 0:
+                                player.action = 12
+                                walk.play()
+                                player.move_down()
+                                player.crosshair_update('down')
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_up()
+                                if abs(player.get_axis_x()) > 0.4:
+                                    if player.axis_x > 0:
+                                        player.action = 11
+                                        player.move_right()
+                                        player.crosshair_update('+right')
+                                        if maze.collision(player.hit_box) != -1:
+                                            player.move_left()
+                                    elif player.axis_x < 0:
+                                        player.action = 13
+                                        player.move_left()
+                                        player.crosshair_update('+left')
+                                        if maze.collision(player.hit_box) != -1:
+                                            player.move_right()
+                        elif abs(player.get_axis_x()) > 0.4:
+                            if player.axis_x > 0:
+                                player.action = 10
+                                walk.play()
+                                player.move_right()
+                                player.crosshair_update('right')
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_left()
+                            elif player.axis_x < 0:
+                                player.action = 14
+                                walk.play()
+                                player.move_left()
+                                player.crosshair_update('left')
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_right()
+                        else:
+                            stop = player.stop_animation(player.action)
+                            player.action = stop
+                        # shooting
+                        if player.controller.get_button(player.shoot):
+                            if player.has_bullet is False:
+                                print('shot fired')
+                                bullets.append(Bullet(player, 40, 40, player.magic))
+                                player.bullet_cooldown = current_time
+                                magic_summon.play()
+                                player.has_bullet = True
 
                 # quit
                 for event in pygame.event.get():
@@ -181,15 +282,6 @@ class Game:
 
                                 elif menu.in_back():
                                     menu.credits_screen = False
-                    # player shooting
-                    for player in players:
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == player.shoot:
-                                if player.has_bullet is False:
-                                    bullets.append(Bullet(player, 40, 40, "assets/sprites/fireball_spritesheet(1).png"))
-                                    player.bullet_cooldown = current_time
-                                    magic_summon.play()
-                                    player.has_bullet = True
 
                 # updating bullets
                 temp_bullets = list(bullets)
@@ -215,8 +307,9 @@ class Game:
                                 wall = maze.walls[maze.collision(bullet.hit_box)]
                                 bullet.update_mvt_y(wall)
                             elif game_mode == 1:
-                                temp_bullets.remove(bullet)
-                                bullet.shooter.has_bullet = False
+                                if bullet in temp_bullets:
+                                    temp_bullets.remove(bullet)
+                                    bullet.shooter.has_bullet = False
 
                         # checking collision with enemies
                         temp_players = list(players)
@@ -254,8 +347,7 @@ class Game:
                         # pygame.draw.rect(screen, BLACK, player.hit_box)  # hit_box
                         screen.blit(player.animation_list[player.action][player.frame],
                                     (player.positionx, player.positiony))
-                        pygame.draw.rect(screen, RED, (player.positionx + player.crosshair_x,
-                                                       player.positiony + player.crosshair_y, 20, 20))
+                        pygame.draw.rect(screen, RED, player.crosshair)
 
                     # update bullet
                     for bullet in bullets:
