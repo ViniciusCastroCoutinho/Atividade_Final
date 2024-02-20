@@ -23,7 +23,7 @@ class Game:
             HALF_W = WIDTH // 2
             GAME_HEIGHT_START = 70
             GAME_HEIGHT = HEIGHT - GAME_HEIGHT_START
-            HALF_GH_LENGHT = GAME_HEIGHT // 2
+            HALF_GH_LENGTH = GAME_HEIGHT // 2
             HALF_GH_POS = GAME_HEIGHT_START + (GAME_HEIGHT // 2)
 
             size = (WIDTH, HEIGHT)
@@ -46,7 +46,7 @@ class Game:
             if map == 0:
                 pass
             elif map == 1:
-                w1 = pygame.Rect(HALF_W - std_dimension + 25, HALF_GH_LENGHT // 2 - 28,
+                w1 = pygame.Rect(HALF_W - std_dimension + 25, HALF_GH_LENGTH // 2 - 28,
                                  std_dimension + 40, 4 * std_dimension + 80)
                 w2 = pygame.Rect(HALF_W // 2 + 65, HALF_GH_POS - std_dimension + 10, 4 *
                                  std_dimension + 27, std_dimension + 20)
@@ -147,10 +147,12 @@ class Game:
                             player.move_up()
                             player.crosshair_update('up')
                             walk.play()
-                            # telekinesses
+                            # telekinesis
                             if player.has_bullet and game_mode == 1:
                                 for bullet in bullets:
-                                    bullet.mvt_y -= bullet.mvt_speed / 25
+                                    if bullet.shooter == player and bullet.mvt_x != 0:
+                                        bullet.mvt_y -= bullet.mvt_speed / 25
+                                        break
                             # check collision
                             if maze.collision(player.hit_box) != -1:
                                 player.move_down()
@@ -174,9 +176,13 @@ class Game:
                             walk.play()
                             player.move_down()
                             player.crosshair_update('down')
+
                             if player.has_bullet and game_mode == 1:
                                 for bullet in bullets:
-                                    bullet.mvt_y += bullet.mvt_speed / 25
+                                    if bullet.shooter == player and bullet.mvt_x != 0:
+                                        bullet.mvt_y += bullet.mvt_speed / 25
+                                        break
+
                             if maze.collision(player.hit_box) != -1:
                                 player.move_up()
 
@@ -200,6 +206,12 @@ class Game:
                             player.move_right()
                             player.crosshair_update('right')
 
+                            if player.has_bullet and game_mode == 1:
+                                for bullet in bullets:
+                                    if bullet.shooter == player and bullet.mvt_y != 0:
+                                        bullet.mvt_x += bullet.mvt_speed / 25
+                                        break
+
                             if maze.collision(player.hit_box) != -1:
                                 player.move_left()
 
@@ -209,11 +221,18 @@ class Game:
                             player.move_left()
                             player.crosshair_update('left')
 
+                            if player.has_bullet and game_mode == 1:
+                                for bullet in bullets:
+                                    if bullet.shooter == player and bullet.mvt_y != 0:
+                                        bullet.mvt_x -= bullet.mvt_speed / 25
+                                        break
+
                             if maze.collision(player.hit_box) != -1:
                                 player.move_right()
                         else:
                             stop = player.stop_animation(player.action)
                             player.action = stop
+
                         # shooting
                         if keys[player.shoot]:
                             if player.has_bullet is False:
@@ -412,7 +431,6 @@ class Game:
 
                     # draw maze part2
                     maze.draw_obstacle(screen, map)
-
 
                     # draw score
                     menu.draw_score(screen, players)
