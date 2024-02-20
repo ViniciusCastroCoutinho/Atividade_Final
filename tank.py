@@ -170,13 +170,13 @@ class Tank:
 
     def respawn(self, screen, maze):
         x = random.randint(0, screen.get_width())
-        y = random.randint(70, screen.get_height())
+        y = random.randint(100, screen.get_height())
         temp_rect = pygame.Rect(x, y, self.width, self.height)
         if maze.collision(temp_rect) != -1:
             invalid = 1
             while invalid:
                 x = random.randint(0, screen.get_width())
-                y = random.randint(70, screen.get_height())
+                y = random.randint(100, screen.get_height())
                 temp_rect = pygame.Rect(x, y, self.width, self.height)
                 if maze.collision(temp_rect) == -1:
                     invalid = 0

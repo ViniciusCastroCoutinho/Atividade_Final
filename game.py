@@ -38,7 +38,7 @@ class Game:
 
             # walls
             std_dimension = 24
-            map = 1
+            map = 2
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w92 = pygame.Rect(0, GAME_HEIGHT_START + 70, WIDTH, std_dimension)  # Top wall
@@ -405,14 +405,11 @@ class Game:
                                     (bullet.x, bullet.y))
 
                     # draw maze part2
-<<<<<<< Updated upstream
                     maze.draw_obstacle(screen, map)
-=======
-                    maze.draw_obstacle(screen, 0)
+
 
                     # draw score
                     menu.draw_score(screen, players)
->>>>>>> Stashed changes
                 # update screen
                 pygame.display.flip()
                 clock.tick(60)
