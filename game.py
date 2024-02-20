@@ -38,7 +38,7 @@ class Game:
 
             # walls
             std_dimension = 24
-            map = 0
+            map = 2
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w92 = pygame.Rect(0, GAME_HEIGHT_START + 70, WIDTH, std_dimension)  # Top wall
@@ -241,6 +241,7 @@ class Game:
                                 player.bullet_cooldown = current_time
                                 magic_summon.play()
                                 player.has_bullet = True
+
                     elif player.control_scheme == 2:
                         # movement
                         if abs(player.get_axis_y()) > 0.4:
@@ -249,8 +250,16 @@ class Game:
                                 player.move_up()
                                 player.crosshair_update('up')
                                 walk.play()
+
+                                if player.has_bullet and game_mode == 1:
+                                    for bullet in bullets:
+                                        if bullet.shooter == player and bullet.mvt_x != 0:
+                                            bullet.mvt_y -= bullet.mvt_speed / 25
+                                            break
+
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_down()
+
                                 if abs(player.get_axis_x()) > 0.4:
                                     if player.axis_x > 0:
                                         player.action = 9
@@ -264,11 +273,19 @@ class Game:
                                         player.crosshair_update('+left')
                                     if maze.collision(player.hit_box) != -1:
                                         player.move_right()
+
                             elif player.axis_y > 0:
                                 player.action = 12
                                 walk.play()
                                 player.move_down()
                                 player.crosshair_update('down')
+
+                                if player.has_bullet and game_mode == 1:
+                                    for bullet in bullets:
+                                        if bullet.shooter == player and bullet.mvt_x != 0:
+                                            bullet.mvt_y += bullet.mvt_speed / 25
+                                            break
+
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_up()
                                 if abs(player.get_axis_x()) > 0.4:
@@ -290,13 +307,28 @@ class Game:
                                 walk.play()
                                 player.move_right()
                                 player.crosshair_update('right')
+
+                                if player.has_bullet and game_mode == 1:
+                                    for bullet in bullets:
+                                        if bullet.shooter == player and bullet.mvt_y != 0:
+                                            bullet.mvt_x += bullet.mvt_speed / 25
+                                            break
+
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_left()
+
                             elif player.axis_x < 0:
                                 player.action = 14
                                 walk.play()
                                 player.move_left()
                                 player.crosshair_update('left')
+
+                                if player.has_bullet and game_mode == 1:
+                                    for bullet in bullets:
+                                        if bullet.shooter == player and bullet.mvt_y != 0:
+                                            bullet.mvt_x -= bullet.mvt_speed / 25
+                                            break
+
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_right()
                         else:
