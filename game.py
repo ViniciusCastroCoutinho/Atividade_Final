@@ -38,7 +38,7 @@ class Game:
 
             # walls
             std_dimension = 24
-            map = 2
+            map = 0
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w92 = pygame.Rect(0, GAME_HEIGHT_START + 70, WIDTH, std_dimension)  # Top wall
@@ -147,6 +147,10 @@ class Game:
                             player.move_up()
                             player.crosshair_update('up')
                             walk.play()
+                            # telekinesses
+                            if player.has_bullet and game_mode == 1:
+                                for bullet in bullets:
+                                    bullet.mvt_y -= bullet.mvt_speed / 25
                             # check collision
                             if maze.collision(player.hit_box) != -1:
                                 player.move_down()
@@ -170,7 +174,9 @@ class Game:
                             walk.play()
                             player.move_down()
                             player.crosshair_update('down')
-
+                            if player.has_bullet and game_mode == 1:
+                                for bullet in bullets:
+                                    bullet.mvt_y += bullet.mvt_speed / 25
                             if maze.collision(player.hit_box) != -1:
                                 player.move_up()
 
