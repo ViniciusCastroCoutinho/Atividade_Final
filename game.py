@@ -39,6 +39,7 @@ class Game:
             # walls
             std_dimension = 24
             map = 2
+            wall_aditional = 70
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w92 = pygame.Rect(0, GAME_HEIGHT_START + 70, WIDTH, std_dimension)  # Top wall
@@ -117,16 +118,16 @@ class Game:
             players.append(p1)
 
             p2 = Tank(p_size_x, p_size_y, WIDTH - std_dimension - p_size_x,
-                      HALF_GH_POS, 2, 1, 1)
+                      HALF_GH_POS, 2, 2, 1)
             players.append(p2)
 
             if len(joysticks) > 0:
                 p3 = Tank(p_size_x, p_size_y, HALF_W,
-                          HEIGHT - 1.5 * p_size_y, 0, 2, 2, joysticks[0])
+                          HEIGHT - 1.5 * p_size_y, 1, 1, 2, joysticks[0])
                 players.append(p3)
                 if len(joysticks) > 1:
                     p4 = Tank(p_size_x, p_size_y, HALF_W,
-                              HEIGHT - 1.5 * p_size_y, 1, 0, 2, joysticks[0])
+                              HEIGHT - 1.5 * p_size_y, 0, 0, 2, joysticks[1])
                     players.append(p4)
 
             # bullets
@@ -140,141 +141,39 @@ class Game:
                 keys = pygame.key.get_pressed()
                 # player controls
                 for player in players:
-                    if player.control_scheme <= 1:
-                        # movement
-                        if keys[player.up]:
-                            player.action = 8
-                            player.move_up()
-                            player.crosshair_update('up')
-                            walk.play()
-                            # telekinesis
-                            if player.has_bullet and game_mode == 1:
-                                for bullet in bullets:
-                                    if bullet.shooter == player and bullet.mvt_x != 0:
-                                        bullet.mvt_y -= bullet.mvt_speed / 25
-                                        break
-                            # check collision
-                            if maze.collision(player.hit_box) != -1:
-                                player.move_down()
-                            # check for diagonal movement
-                            if keys[player.right]:
-                                player.action = 9
-                                player.move_right()
-                                player.crosshair_update('+right')
-                                if maze.collision(player.hit_box) != -1:
-                                    player.move_left()
-
-                            elif keys[player.left]:
-                                player.action = 15
-                                player.move_left()
-                                player.crosshair_update('+left')
-                            if maze.collision(player.hit_box) != -1:
-                                player.move_right()
-
-                        elif keys[player.down]:
-                            player.action = 12
-                            walk.play()
-                            player.move_down()
-                            player.crosshair_update('down')
-
-                            if player.has_bullet and game_mode == 1:
-                                for bullet in bullets:
-                                    if bullet.shooter == player and bullet.mvt_x != 0:
-                                        bullet.mvt_y += bullet.mvt_speed / 25
-                                        break
-
-                            if maze.collision(player.hit_box) != -1:
-                                player.move_up()
-
-                            if keys[player.right]:
-                                player.action = 11
-                                player.move_right()
-                                player.crosshair_update('+right')
-                                if maze.collision(player.hit_box) != -1:
-                                    player.move_left()
-
-                            elif keys[player.left]:
-                                player.action = 13
-                                player.move_left()
-                                player.crosshair_update('+left')
-                                if maze.collision(player.hit_box) != -1:
-                                    player.move_right()
-
-                        elif keys[player.right]:
-                            player.action = 10
-                            walk.play()
-                            player.move_right()
-                            player.crosshair_update('right')
-
-                            if player.has_bullet and game_mode == 1:
-                                for bullet in bullets:
-                                    if bullet.shooter == player and bullet.mvt_y != 0:
-                                        bullet.mvt_x += bullet.mvt_speed / 25
-                                        break
-
-                            if maze.collision(player.hit_box) != -1:
-                                player.move_left()
-
-                        elif keys[player.left]:
-                            player.action = 14
-                            walk.play()
-                            player.move_left()
-                            player.crosshair_update('left')
-
-                            if player.has_bullet and game_mode == 1:
-                                for bullet in bullets:
-                                    if bullet.shooter == player and bullet.mvt_y != 0:
-                                        bullet.mvt_x -= bullet.mvt_speed / 25
-                                        break
-
-                            if maze.collision(player.hit_box) != -1:
-                                player.move_right()
-                        else:
-                            stop = player.stop_animation(player.action)
-                            player.action = stop
-
-                        # shooting
-                        if keys[player.shoot]:
-                            if player.has_bullet is False:
-                                bullets.append(Bullet(player, 40, 40,
-                                                      player.magic))
-                                player.bullet_cooldown = current_time
-                                magic_summon.play()
-                                player.has_bullet = True
-
-                    elif player.control_scheme == 2:
-                        # movement
-                        if abs(player.get_axis_y()) > 0.4:
-                            if player.axis_y < 0:
+                    if not player.dead:
+                        if player.control_scheme <= 1:
+                            # movement
+                            if keys[player.up]:
                                 player.action = 8
                                 player.move_up()
                                 player.crosshair_update('up')
                                 walk.play()
-
+                                # telekinesis
                                 if player.has_bullet and game_mode == 1:
                                     for bullet in bullets:
                                         if bullet.shooter == player and bullet.mvt_x != 0:
                                             bullet.mvt_y -= bullet.mvt_speed / 25
                                             break
-
+                                # check collision
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_down()
-
-                                if abs(player.get_axis_x()) > 0.4:
-                                    if player.axis_x > 0:
-                                        player.action = 9
-                                        player.move_right()
-                                        player.crosshair_update('+right')
-                                        if maze.collision(player.hit_box) != -1:
-                                            player.move_left()
-                                    elif player.axis_x < 0:
-                                        player.action = 15
-                                        player.move_left()
-                                        player.crosshair_update('+left')
+                                # check for diagonal movement
+                                if keys[player.right]:
+                                    player.action = 9
+                                    player.move_right()
+                                    player.crosshair_update('+right')
                                     if maze.collision(player.hit_box) != -1:
-                                        player.move_right()
+                                        player.move_left()
 
-                            elif player.axis_y > 0:
+                                elif keys[player.left]:
+                                    player.action = 15
+                                    player.move_left()
+                                    player.crosshair_update('+left')
+                                if maze.collision(player.hit_box) != -1:
+                                    player.move_right()
+
+                            elif keys[player.down]:
                                 player.action = 12
                                 walk.play()
                                 player.move_down()
@@ -288,21 +187,22 @@ class Game:
 
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_up()
-                                if abs(player.get_axis_x()) > 0.4:
-                                    if player.axis_x > 0:
-                                        player.action = 11
-                                        player.move_right()
-                                        player.crosshair_update('+right')
-                                        if maze.collision(player.hit_box) != -1:
-                                            player.move_left()
-                                    elif player.axis_x < 0:
-                                        player.action = 13
+
+                                if keys[player.right]:
+                                    player.action = 11
+                                    player.move_right()
+                                    player.crosshair_update('+right')
+                                    if maze.collision(player.hit_box) != -1:
                                         player.move_left()
-                                        player.crosshair_update('+left')
-                                        if maze.collision(player.hit_box) != -1:
-                                            player.move_right()
-                        elif abs(player.get_axis_x()) > 0.4:
-                            if player.axis_x > 0:
+
+                                elif keys[player.left]:
+                                    player.action = 13
+                                    player.move_left()
+                                    player.crosshair_update('+left')
+                                    if maze.collision(player.hit_box) != -1:
+                                        player.move_right()
+
+                            elif keys[player.right]:
                                 player.action = 10
                                 walk.play()
                                 player.move_right()
@@ -317,7 +217,7 @@ class Game:
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_left()
 
-                            elif player.axis_x < 0:
+                            elif keys[player.left]:
                                 player.action = 14
                                 walk.play()
                                 player.move_left()
@@ -331,17 +231,119 @@ class Game:
 
                                 if maze.collision(player.hit_box) != -1:
                                     player.move_right()
-                        else:
-                            stop = player.stop_animation(player.action)
-                            player.action = stop
-                        # shooting
-                        if player.controller.get_button(player.shoot):
-                            if player.has_bullet is False:
-                                print('shot fired')
-                                bullets.append(Bullet(player, 40, 40, player.magic))
-                                player.bullet_cooldown = current_time
-                                magic_summon.play()
-                                player.has_bullet = True
+                            else:
+                                stop = player.stop_animation(player.action)
+                                player.action = stop
+
+                            # shooting
+                            if keys[player.shoot]:
+                                if player.has_bullet is False:
+                                    bullets.append(Bullet(player, 40, 40,
+                                                          player.magic))
+                                    player.bullet_cooldown = current_time
+                                    magic_summon.play()
+                                    player.has_bullet = True
+
+                        elif player.control_scheme == 2:
+                            # movement
+                            if abs(player.get_axis_y()) > 0.4:
+                                if player.axis_y < 0:
+                                    player.action = 8
+                                    player.move_up()
+                                    player.crosshair_update('up')
+                                    walk.play()
+
+                                    if player.has_bullet and game_mode == 1:
+                                        for bullet in bullets:
+                                            if bullet.shooter == player and bullet.mvt_x != 0:
+                                                bullet.mvt_y -= bullet.mvt_speed / 25
+                                                break
+
+                                    if maze.collision(player.hit_box) != -1:
+                                        player.move_down()
+
+                                    if abs(player.get_axis_x()) > 0.4:
+                                        if player.axis_x > 0:
+                                            player.action = 9
+                                            player.move_right()
+                                            player.crosshair_update('+right')
+                                            if maze.collision(player.hit_box) != -1:
+                                                player.move_left()
+                                        elif player.axis_x < 0:
+                                            player.action = 15
+                                            player.move_left()
+                                            player.crosshair_update('+left')
+                                        if maze.collision(player.hit_box) != -1:
+                                            player.move_right()
+
+                                elif player.axis_y > 0:
+                                    player.action = 12
+                                    walk.play()
+                                    player.move_down()
+                                    player.crosshair_update('down')
+
+                                    if player.has_bullet and game_mode == 1:
+                                        for bullet in bullets:
+                                            if bullet.shooter == player and bullet.mvt_x != 0:
+                                                bullet.mvt_y += bullet.mvt_speed / 25
+                                                break
+
+                                    if maze.collision(player.hit_box) != -1:
+                                        player.move_up()
+                                    if abs(player.get_axis_x()) > 0.4:
+                                        if player.axis_x > 0:
+                                            player.action = 11
+                                            player.move_right()
+                                            player.crosshair_update('+right')
+                                            if maze.collision(player.hit_box) != -1:
+                                                player.move_left()
+                                        elif player.axis_x < 0:
+                                            player.action = 13
+                                            player.move_left()
+                                            player.crosshair_update('+left')
+                                            if maze.collision(player.hit_box) != -1:
+                                                player.move_right()
+                            elif abs(player.get_axis_x()) > 0.4:
+                                if player.axis_x > 0:
+                                    player.action = 10
+                                    walk.play()
+                                    player.move_right()
+                                    player.crosshair_update('right')
+
+                                    if player.has_bullet and game_mode == 1:
+                                        for bullet in bullets:
+                                            if bullet.shooter == player and bullet.mvt_y != 0:
+                                                bullet.mvt_x += bullet.mvt_speed / 25
+                                                break
+
+                                    if maze.collision(player.hit_box) != -1:
+                                        player.move_left()
+
+                                elif player.axis_x < 0:
+                                    player.action = 14
+                                    walk.play()
+                                    player.move_left()
+                                    player.crosshair_update('left')
+
+                                    if player.has_bullet and game_mode == 1:
+                                        for bullet in bullets:
+                                            if bullet.shooter == player and bullet.mvt_y != 0:
+                                                bullet.mvt_x -= bullet.mvt_speed / 25
+                                                break
+
+                                    if maze.collision(player.hit_box) != -1:
+                                        player.move_right()
+                            else:
+                                stop = player.stop_animation(player.action)
+                                player.action = stop
+                            # shooting
+                            if player.controller.get_button(player.shoot):
+                                if player.has_bullet is False:
+                                    print('shot fired')
+                                    bullets.append(Bullet(player, 40, 40, player.magic))
+                                    player.bullet_cooldown = current_time
+                                    magic_summon.play()
+                                    player.has_bullet = True
 
                 # quit
                 for event in pygame.event.get():
@@ -409,6 +411,7 @@ class Game:
                                 temp_bullets.remove(bullet)
                                 player_take_damage.play()
                                 player.death()
+                                player.frame = 0
                                 bullet.shooter.score += 1
                                 bullet.shooter.has_bullet = False
                 bullets = temp_bullets
@@ -420,6 +423,7 @@ class Game:
                             player.respawn(screen, maze)
                             player.dead = False
                             player.crosshair_update('up')
+                            player.frame = 0
 
                 # drawing
                 if menu.status() is True:
@@ -432,7 +436,11 @@ class Game:
                 else:
                     # maze part 1
                     maze.draw_map(screen, map)
-                    # maze.draw(screen, YELLOW)
+                    for wall in maze.walls:
+                        if wall == wall_aditional:
+                            column = maze.scaled("assets/walls/wall_lower.png")
+                            screen.blit(column, (wall[0], wall[1]))
+                    #maze.draw(screen, YELLOW)
 
                     # update animation walking
                     for player in players:
@@ -463,6 +471,10 @@ class Game:
 
                     # draw maze part2
                     maze.draw_obstacle(screen, map)
+                    for wall in maze.walls:
+                        if wall == wall_aditional:
+                            column = maze.scaled("assets/walls/wall_upper.png")
+                            screen.blit(column, (wall[0], wall[1] - 64))
 
                     # draw score
                     menu.draw_score(screen, players)

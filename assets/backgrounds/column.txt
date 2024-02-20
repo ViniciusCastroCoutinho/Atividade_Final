@@ -1,0 +1,1 @@
+wall_aditional = pygame.Rect(WIDTH // 2 + 69, HALF_GH_POS - std_dimension - 118, 4 * std_dimension - 40, std_dimension - 5)
