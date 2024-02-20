@@ -38,7 +38,7 @@ class Game:
 
             # walls
             std_dimension = 24
-            map = 0
+            map = 2
             wall_aditional = 70
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
@@ -118,16 +118,16 @@ class Game:
             players.append(p1)
 
             p2 = Tank(p_size_x, p_size_y, WIDTH - std_dimension - p_size_x,
-                      HALF_GH_POS, 2, 1, 1)
+                      HALF_GH_POS, 2, 2, 1)
             players.append(p2)
 
             if len(joysticks) > 0:
                 p3 = Tank(p_size_x, p_size_y, HALF_W,
-                          HEIGHT - 1.5 * p_size_y, 0, 2, 2, joysticks[0])
+                          HEIGHT - 1.5 * p_size_y, 1, 1, 2, joysticks[0])
                 players.append(p3)
                 if len(joysticks) > 1:
                     p4 = Tank(p_size_x, p_size_y, HALF_W,
-                              HEIGHT - 1.5 * p_size_y, 1, 0, 2, joysticks[0])
+                              HEIGHT - 1.5 * p_size_y, 0, 0, 2, joysticks[1])
                     players.append(p4)
 
             # bullets
