@@ -38,27 +38,62 @@ class Game:
 
             # walls
             std_dimension = 24
+            map = 1
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
-            w92 = pygame.Rect(0, GAME_HEIGHT_START + 40, WIDTH, std_dimension)  # Top wall
+            w92 = pygame.Rect(0, GAME_HEIGHT_START + 70, WIDTH, std_dimension)  # Top wall
             w93 = pygame.Rect(0, HEIGHT - std_dimension, WIDTH, std_dimension)
-            w1 = pygame.Rect(HALF_W - std_dimension + 25, HALF_GH_LENGHT // 2 - 28, std_dimension + 40, 4 * std_dimension + 80)
-            w2 = pygame.Rect(HALF_W // 2 + 65, HALF_GH_POS - std_dimension + 10, 4 * std_dimension + 27, std_dimension + 20)
-            w3 = pygame.Rect(HALF_W // 4 - 32, 2 * HALF_GH_POS // 3 - 10, 2 * std_dimension + 77, std_dimension + 20)
-            w4 = pygame.Rect(w3[0] + w3[2] // 2 + 9, w3[1], w3[2] // 2 - 8, HALF_GH_POS - w3[1])
+            if map == 0:
+                pass
+            elif map == 1:
+                w1 = pygame.Rect(HALF_W - std_dimension + 25, HALF_GH_LENGHT // 2 - 28,
+                                 std_dimension + 40, 4 * std_dimension + 80)
+                w2 = pygame.Rect(HALF_W // 2 + 65, HALF_GH_POS - std_dimension + 10, 4 *
+                                 std_dimension + 27, std_dimension + 20)
+                w3 = pygame.Rect(HALF_W // 4 - 32, 2 * HALF_GH_POS // 3 - 10, 2 *
+                                 std_dimension + 77, std_dimension + 20)
+                w4 = pygame.Rect(w3[0] + w3[2] // 2 + 9, w3[1], w3[2] // 2 - 8, HALF_GH_POS - w3[1])
+
+            elif map == 2:
+                w1 = pygame.Rect(HALF_W // 2 + 70, HALF_GH_POS - std_dimension + 10, 4 *
+                                 std_dimension - 40, std_dimension - 5)
+                w2 = pygame.Rect(WIDTH // 2 + 69, HALF_GH_POS - std_dimension - 118, 4 *
+                                 std_dimension - 40, std_dimension - 5)
+                w3 = pygame.Rect(HALF_W // 4 - 32, 2 * HALF_GH_POS // 3 - 10, 2 *
+                                 std_dimension + 77, std_dimension + 20)
+                w4 = pygame.Rect(w3[0] + w3[2] // 2 + 9, w3[1], w3[2] // 2 - 8, HALF_GH_POS - w3[1])
+                w5 = pygame.Rect(w2[0] - 197, w2[1], w2[2], w2[3])
 
             # maze
             maze = Maze()
-            maze.add_wall(w1)
-            maze.add_wall(w2)
-            maze.add_wall(w3)
-            maze.add_wall(w4)
-            maze.mirror_walls_horizontally(GAME_HEIGHT_START, HEIGHT)
-            maze.mirror_walls_vertically(WIDTH)
-            maze.add_wall(w90)
-            maze.add_wall(w91)
-            maze.add_wall(w92)
-            maze.add_wall(w93)
+            if map == 0:
+                maze.add_wall(w90)
+                maze.add_wall(w91)
+                maze.add_wall(w92)
+                maze.add_wall(w93)
+            elif map == 1:
+                maze.add_wall(w1)
+                maze.add_wall(w2)
+                maze.add_wall(w3)
+                maze.add_wall(w4)
+                maze.mirror_walls_horizontally(GAME_HEIGHT_START, HEIGHT)
+                maze.mirror_walls_vertically(WIDTH)
+                maze.add_wall(w90)
+                maze.add_wall(w91)
+                maze.add_wall(w92)
+                maze.add_wall(w93)
+            elif map == 2:
+                maze.add_wall(w1)
+                maze.add_wall(w2)
+                maze.add_wall(w3)
+                maze.add_wall(w4)
+                maze.add_wall(w5)
+                maze.mirror_walls_horizontally(GAME_HEIGHT_START, HEIGHT)
+                maze.mirror_walls_vertically(WIDTH)
+                maze.add_wall(w90)
+                maze.add_wall(w91)
+                maze.add_wall(w92)
+                maze.add_wall(w93)
 
             # music & sounds
             pygame.mixer.music.load(
@@ -332,8 +367,8 @@ class Game:
                         menu.credits_menu(screen, 3, WHITE)
                 else:
                     # maze part 1
-                    maze.draw_map(screen, 0)
-                    #maze.draw(screen, YELLOW)
+                    maze.draw_map(screen, map)
+                    # maze.draw(screen, YELLOW)
 
                     # update animation walking
                     for player in players:
@@ -362,7 +397,7 @@ class Game:
                                     (bullet.x, bullet.y))
 
                     # draw maze part2
-                    maze.draw_obstacle(screen, 0)
+                    maze.draw_obstacle(screen, map)
                 # update screen
                 pygame.display.flip()
                 clock.tick(60)

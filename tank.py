@@ -62,7 +62,6 @@ class Tank:
                 self.step_counter += 1
             self.animation_list.append(temp_img_list)
 
-
         # control scheme
         if control_scheme == 0:
             self.up = pygame.K_w
