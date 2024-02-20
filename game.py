@@ -16,7 +16,7 @@ class Game:
             RED = (144, 38, 10)
             YELLOW = (216, 169, 64)
             WHITE = (255, 255, 255)
-            BLACK = (0 , 0, 0)
+            BLACK = (0, 0, 0)
 
             WIDTH = 1280
             HEIGHT = 720
@@ -40,12 +40,12 @@ class Game:
             std_dimension = 24
             w90 = pygame.Rect(0, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
             w91 = pygame.Rect(WIDTH - std_dimension, GAME_HEIGHT_START, std_dimension, GAME_HEIGHT)
-            w92 = pygame.Rect(0, GAME_HEIGHT_START, WIDTH, std_dimension)
+            w92 = pygame.Rect(0, GAME_HEIGHT_START + 40, WIDTH, std_dimension)  # Top wall
             w93 = pygame.Rect(0, HEIGHT - std_dimension, WIDTH, std_dimension)
-            w1 = pygame.Rect(HALF_W - std_dimension, HALF_GH_LENGHT // 2, std_dimension, 4 * std_dimension)
-            w2 = pygame.Rect(HALF_W // 2, HALF_GH_POS - std_dimension, 4 * std_dimension, std_dimension)
-            w3 = pygame.Rect(HALF_W // 4, 2 * HALF_GH_POS // 3, 2 * std_dimension, std_dimension)
-            w4 = pygame.Rect(w3[0] + w3[2] // 2, w3[1], w3[2] // 2, HALF_GH_POS - w3[1])
+            w1 = pygame.Rect(HALF_W - std_dimension + 25, HALF_GH_LENGHT // 2 - 28, std_dimension + 40, 4 * std_dimension + 80)
+            w2 = pygame.Rect(HALF_W // 2 + 65, HALF_GH_POS - std_dimension + 10, 4 * std_dimension + 27, std_dimension + 20)
+            w3 = pygame.Rect(HALF_W // 4 - 32, 2 * HALF_GH_POS // 3 - 10, 2 * std_dimension + 77, std_dimension + 20)
+            w4 = pygame.Rect(w3[0] + w3[2] // 2 + 9, w3[1], w3[2] // 2 - 8, HALF_GH_POS - w3[1])
 
             # maze
             maze = Maze()
@@ -331,9 +331,9 @@ class Game:
                         menu.menu_background(screen)
                         menu.credits_menu(screen, 3, WHITE)
                 else:
-                    # maze
+                    # maze part 1
                     maze.draw_map(screen, 0)
-                    maze.draw(screen, YELLOW)
+                    #maze.draw(screen, YELLOW)
 
                     # update animation walking
                     for player in players:
@@ -361,6 +361,8 @@ class Game:
                         screen.blit(bullet.animation_list[bullet.action][bullet.frame],
                                     (bullet.x, bullet.y))
 
+                    # draw maze part2
+                    maze.draw_obstacle(screen, 0)
                 # update screen
                 pygame.display.flip()
                 clock.tick(60)
