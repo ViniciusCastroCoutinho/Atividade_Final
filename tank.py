@@ -1,6 +1,6 @@
 import pygame
 import spritesheet
-from bullet import Bullet
+import random
 
 
 class Tank:
@@ -12,9 +12,14 @@ class Tank:
         self.hit_box = pygame.Rect(self.positionx, self.positiony, self.width, self.height)
         self.mvt_speed = 4
         self.control_scheme = control_scheme
+        self.score = 0
+        self.respawn_cooldown = 2000
+        self.time_of_death = 0
+        self.dead = False
         if controller is not None:
             self.controller = controller
 
+        self.skin = skin
         if skin == 0:
             sprite = "assets/sprites/black_mage.png"
         elif skin == 1:
@@ -24,6 +29,8 @@ class Tank:
         elif skin == 3:
             sprite = "assets/sprites/white_mage.png"
         elif skin == 4:
+            sprite = "assets/sprites/green_mage.png"
+        else:
             sprite = "assets/sprites/green_mage.png"
 
         if magic == 0:
@@ -156,3 +163,24 @@ class Tank:
             return 1
         else:
             return 0
+
+    def death(self):
+        self.dead = True
+        self.time_of_death = pygame.time.get_ticks()
+
+    def respawn(self, screen, maze):
+        x = random.randint(0, screen.get_width())
+        y = random.randint(70, screen.get_height())
+        temp_rect = pygame.Rect(x, y, self.width, self.height)
+        if maze.collision(temp_rect) != -1:
+            invalid = 1
+            while invalid:
+                x = random.randint(0, screen.get_width())
+                y = random.randint(70, screen.get_height())
+                temp_rect = pygame.Rect(x, y, self.width, self.height)
+                if maze.collision(temp_rect) == -1:
+                    invalid = 0
+        self.positionx = x
+        self.positiony = y
+        self.action = 0
+        self.hit_box = temp_rect

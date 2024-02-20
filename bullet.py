@@ -8,6 +8,7 @@ class Bullet:
         self.height = height
         self.shooter = shooter
         self.mvt_speed = 8
+        self.telekinesis = 4
         self.hit_box = pygame.Rect(0, 0, width, height)
         self.hit_box.center = shooter.hit_box.center
         self.x = self.hit_box.topleft[0]

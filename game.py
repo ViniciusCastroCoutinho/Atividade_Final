@@ -321,7 +321,7 @@ class Game:
                 # updating bullets
                 temp_bullets = list(bullets)
                 for bullet in bullets:
-                    if bullet.is_over() or bullet.is_out_of_bounds(screen) or bullet.is_in_wall(maze):
+                    if bullet.is_over() or bullet.is_out_of_bounds(screen):
                         temp_bullets.remove(bullet)
                         bullet.shooter.has_bullet = False
                     else:
@@ -347,15 +347,22 @@ class Game:
                                     bullet.shooter.has_bullet = False
 
                         # checking collision with enemies
-                        temp_players = list(players)
                         for player in players:
-                            if player != bullet.shooter and player.bullet_collision(bullet):
+                            if player != bullet.shooter and player.bullet_collision(bullet) and not player.dead:
                                 temp_bullets.remove(bullet)
-                                temp_players.remove(player)
                                 player_take_damage.play()
+                                player.death()
+                                bullet.shooter.score += 1
                                 bullet.shooter.has_bullet = False
-                        players = temp_players
                 bullets = temp_bullets
+
+                # respawning dead players
+                for player in players:
+                    if player.dead:
+                        if current_time - player.time_of_death >= player.respawn_cooldown:
+                            player.respawn(screen, maze)
+                            player.dead = False
+                            player.crosshair_update('up')
 
                 # drawing
                 if menu.status() is True:
@@ -379,10 +386,11 @@ class Game:
                                 player.frame = 0
 
                         # show frame
-                        # pygame.draw.rect(screen, BLACK, player.hit_box)  # hit_box
-                        screen.blit(player.animation_list[player.action][player.frame],
-                                    (player.positionx, player.positiony))
-                        pygame.draw.rect(screen, RED, player.crosshair)
+                        if not player.dead:
+                            # pygame.draw.rect(screen, BLACK, player.hit_box)  # hit_box
+                            screen.blit(player.animation_list[player.action][player.frame],
+                                        (player.positionx, player.positiony))
+                            pygame.draw.rect(screen, RED, player.crosshair)
 
                     # update bullet
                     for bullet in bullets:
@@ -397,7 +405,14 @@ class Game:
                                     (bullet.x, bullet.y))
 
                     # draw maze part2
+<<<<<<< Updated upstream
                     maze.draw_obstacle(screen, map)
+=======
+                    maze.draw_obstacle(screen, 0)
+
+                    # draw score
+                    menu.draw_score(screen, players)
+>>>>>>> Stashed changes
                 # update screen
                 pygame.display.flip()
                 clock.tick(60)

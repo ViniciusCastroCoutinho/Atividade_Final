@@ -81,6 +81,9 @@ class Menu:
         self.vinicius_x = WIDTH // 2 - (self.vinicius_w // 2)
         self.vinicius_y = 8 * HEIGHT // 12
 
+        self.score_font = pygame.font.Font('assets/text/RPGgame.ttf', 50)
+
+
     def status(self):
         return self.in_menu
 
@@ -163,3 +166,26 @@ class Menu:
             screen.blit(self.back, (self.back_x, self.back_y))
         else:
             screen.blit(self.back, (self.back_x, self.back_y))
+
+    def draw_score(self, screen, players):
+        width = screen.get_width()
+        count = 0
+        for player in players:
+            if player.skin == 0:
+                color = (53, 53, 53)
+            elif player.skin == 1:
+                color = (0, 141, 199)
+            elif player.skin == 2:
+                color = (223, 0, 0)
+            elif player.skin == 3:
+                color = (232, 232, 232)
+            elif player.skin == 4:
+                color = (79, 149, 74)
+            else:
+                color = (255, 255, 0)
+            score = self.score_font.render(f'{player.score}', True, color, None)
+            score_w = score.get_width()
+            score_x = score_w + count * width / 4
+            score_y = 35
+            screen.blit(score, (score_x, score_y))
+            count += 1
