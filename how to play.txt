@@ -1,0 +1,7 @@
+player1: wasd + space
+player2: arrow keys + rshift
+if you want to use controllers:
+	only the ps5 controller is supported, and only up to 2 controllers at the same time
+	connect the controller(s) BEFORE running main.py
+	this will add player3 which uses the first controller, and player4 which uses the second controller, if present
+	players 3 and 4: left analog stick + x button
